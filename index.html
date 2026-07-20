@@ -6,10 +6,10 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<meta name="description" content="律所实习生存模拟器 · HJC の噩梦 —— 一款黑色幽默的实习劝退互动小游戏" />
-<meta property="og:title" content="律所实习生存模拟器 · HJC の噩梦" />
-<meta property="og:description" content="八大名场面、五种结局，看你能撑几天。" />
-<title>律所实习生存模拟器 · HJC の噩梦</title>
+<meta name="description" content="律所实习生存模拟器 · HJC の噩梦 v2 —— 黑色幽默的实习劝退互动小游戏" />
+<meta property="og:title" content="律所实习生存模拟器 · HJC の噩梦 v2" />
+<meta property="og:description" content="随机事件 · 证据收集 · 15 成就 · 8 结局 · 生成分享卡" />
+<title>律所实习生存模拟器 · HJC の噩梦 v2.0</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet" />
@@ -37,7 +37,6 @@
     overflow-x:hidden;
   }
   .serif{font-family:'Noto Serif SC',serif}
-  /* paper texture */
   .paper{
     background:
       linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,.5)),
@@ -45,24 +44,16 @@
     background-color:var(--paper);
   }
   .stamp{
-    border:3px solid var(--blood);
-    color:var(--blood);
-    transform:rotate(-9deg);
-    border-radius:8px;
-    letter-spacing:.15em;
-    box-shadow:inset 0 0 0 2px rgba(166,35,29,.25);
-    opacity:.9;
+    border:3px solid var(--blood);color:var(--blood);
+    transform:rotate(-9deg);border-radius:8px;letter-spacing:.15em;
+    box-shadow:inset 0 0 0 2px rgba(166,35,29,.25);opacity:.9;
   }
-  .btn{
-    transition:transform .15s ease, box-shadow .15s ease, background .2s;
-    will-change:transform;
-  }
+  .btn{transition:transform .15s ease, box-shadow .15s ease, background .2s;will-change:transform;}
   .btn:hover{transform:translateY(-2px)}
   .btn:active{transform:translateY(1px) scale(.99)}
-  .choice{
-    transition:transform .15s ease, box-shadow .2s, border-color .2s, background .2s;
-  }
+  .choice{transition:transform .15s ease, box-shadow .2s, border-color .2s, background .2s;}
   .choice:hover{transform:translateX(6px); box-shadow:-6px 6px 0 rgba(36,31,26,.12)}
+  .choice:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
   .bar-fill{transition:width .6s cubic-bezier(.22,1,.36,1), background .4s}
   @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(4px)}}
   .shake{animation:shake .5s}
@@ -72,7 +63,8 @@
   .pop{animation:pop .45s cubic-bezier(.22,1,.36,1) both}
   @keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(166,35,29,.4)}50%{box-shadow:0 0 0 12px rgba(166,35,29,0)}}
   .glow{animation:pulseGlow 2s infinite}
-  /* boss speech bubble */
+  @keyframes toastIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:none}}
+  .toast-in{animation:toastIn .3s ease both}
   .bubble{position:relative;background:#2b2622;color:#f4efe4}
   .bubble:after{content:"";position:absolute;left:38px;bottom:-14px;border-width:14px 14px 0;border-style:solid;border-color:#2b2622 transparent transparent}
   .danmu{position:fixed;white-space:nowrap;font-weight:700;pointer-events:none;z-index:60;text-shadow:0 1px 3px rgba(0,0,0,.35)}
@@ -82,39 +74,95 @@
   ::-webkit-scrollbar{width:10px}
   ::-webkit-scrollbar-thumb{background:#c3b89f;border-radius:8px}
   .kicker{letter-spacing:.35em}
+  /* 背包抽屉 */
+  .bag-drawer{position:fixed;top:0;right:0;height:100%;width:min(360px,90vw);background:var(--paper);border-left:2px solid #d8cdb5;box-shadow:-8px 0 24px rgba(0,0,0,.15);transform:translateX(100%);transition:transform .35s cubic-bezier(.22,1,.36,1);z-index:70;overflow-y:auto}
+  .bag-drawer.open{transform:translateX(0)}
+  .bag-mask{position:fixed;inset:0;background:rgba(36,31,26,.35);z-index:65;opacity:0;pointer-events:none;transition:opacity .3s}
+  .bag-mask.on{opacity:1;pointer-events:auto}
+  /* 微信聊天 */
+  .wx{background:#ededed;min-height:100vh}
+  .wx-bubble-left{background:#fff;border-radius:6px;padding:10px 14px;max-width:78%;box-shadow:0 1px 2px rgba(0,0,0,.06);white-space:pre-wrap;word-break:break-word}
+  .wx-bubble-right{background:#95ec69;border-radius:6px;padding:10px 14px;max-width:78%;box-shadow:0 1px 2px rgba(0,0,0,.06);white-space:pre-wrap;word-break:break-word}
+  .wx-avatar{width:36px;height:36px;border-radius:6px;display:grid;place-items:center;font-weight:900;flex-shrink:0}
+  /* Boss 倒计时 */
+  .timer-ring{--pct:100;background:conic-gradient(var(--blood) calc(var(--pct)*1%),#e6ddc9 0);border-radius:9999px}
+  .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:80;background:#2b2622;color:#f4efe4;padding:10px 16px;border-radius:12px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+  .item-slot{aspect-ratio:1/1;border:2px dashed #d8cdb5;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;text-align:center;background:rgba(255,255,255,.4)}
+  .item-slot.have{background:rgba(198,235,166,.25);border-style:solid;border-color:var(--olive);color:var(--ink)}
+  .item-slot.dim{opacity:.45}
+  .achv-badge{background:rgba(255,255,255,.6);border:1px solid #e2d8c2;border-radius:12px;padding:10px;display:flex;gap:8px;align-items:flex-start}
+  .achv-badge.lock{opacity:.4}
 </style>
 </head>
 <body>
 <!-- 弹幕层 -->
 <div id="danmuLayer"></div>
+<!-- 全局 toast -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- 背包抽屉 -->
+<div id="bagMask" class="bag-mask"></div>
+<aside id="bagDrawer" class="bag-drawer">
+  <div class="p-4 border-b border-[#d8cdb5] flex items-center justify-between">
+    <div>
+      <p class="text-xs text-[var(--blood)] font-bold kicker">EVIDENCE BAG · 证据背包</p>
+      <p class="text-sm text-[var(--ink)]/60 mt-1">本局收集：<span id="bagCount" class="font-black serif text-[var(--blood)]">0</span> / 6</p>
+    </div>
+    <button id="bagClose" class="text-[var(--ink)]/60 hover:text-[var(--blood)]"><span class="material-symbols-outlined">close</span></button>
+  </div>
+  <div class="p-4">
+    <div id="bagGrid" class="grid grid-cols-2 gap-3"></div>
+    <p class="text-[11px] text-[var(--ink)]/50 mt-4 leading-relaxed">
+      💡 集齐 <b>3 件</b>解锁「举证维权」终局选项；<br/>
+      集齐 <b>5 件</b>解锁隐藏结局「司法局约谈 HJC」。
+    </p>
+  </div>
+</aside>
 
 <div class="max-w-3xl mx-auto px-4 py-6 md:py-10">
 
-  <!-- ===================== 开始界面 ===================== -->
+  <!-- ============= 开始界面 ============= -->
   <section id="screen-start" class="float-in">
     <div class="text-center mb-6">
-      <p class="kicker text-xs md:text-sm text-[var(--blood)] font-bold mb-3">B L A C K &nbsp; L A W &nbsp; F I R M &nbsp; S I M</p>
+      <p class="kicker text-xs md:text-sm text-[var(--blood)] font-bold mb-3">B L A C K &nbsp; L A W &nbsp; F I R M &nbsp; S I M &nbsp; · &nbsp; v 2 . 0</p>
       <h1 class="serif font-black leading-tight text-4xl md:text-6xl text-[var(--ink)]">
         律所实习<br/><span class="text-[var(--blood)]">生存模拟器</span>
       </h1>
-      <p class="serif text-lg md:text-xl mt-3 text-[var(--steel)]">—— HJC の噩梦 ——</p>
+      <p class="serif text-lg md:text-xl mt-3 text-[var(--steel)]">—— HJC の噩梦 · 完全版 ——</p>
     </div>
 
     <div class="paper rounded-2xl shadow-xl border border-[#d8cdb5] p-6 md:p-8 relative overflow-hidden">
       <div class="absolute -right-2 -top-2 stamp px-3 py-1 text-xs md:text-sm font-black serif">高危 · 慎入</div>
       <p class="text-[15px] md:text-base leading-relaxed text-[var(--ink)]/90">
         你是一名满怀憧憬的法学院实习生。今天，你入职了一家<strong class="text-[var(--blood)]">"传说中"</strong>的律所，
-        带教你的是——<strong class="serif">HJC 律师</strong>。
+        带教你是——<strong class="serif">HJC 律师</strong>。
       </p>
       <p class="text-[15px] md:text-base leading-relaxed text-[var(--ink)]/90 mt-3">
-        接下来的日子里，你将亲历他的<strong>八大名场面</strong>：无限工作量、听不懂人话、"来解决问题不是来学习"、
-        克扣日薪、拖欠报销、砍价修罗场……
-      </p>
-      <p class="text-[15px] md:text-base leading-relaxed mt-3 text-[var(--steel)]">
-        你的目标：在<strong>精神值</strong>归零之前，尽量多熬几天、少被薅几块钱。<br/>
-        <span class="text-sm text-[var(--ink)]/60">（这是一款黑色幽默劝退模拟器，纯属娱乐 😌）</span>
+        v2 新增：<strong>随机事件</strong> · <strong>证据收集</strong> · <strong>15 成就</strong> · <strong>8 结局</strong> · <strong>结算聊天</strong> · <strong>分享卡下载</strong>。
       </p>
 
+      <!-- 身份选择 -->
+      <div class="mt-5">
+        <p class="text-xs text-[var(--blood)] font-bold kicker mb-2">选择你的实习生身份 →</p>
+        <div id="identityGrid" class="grid grid-cols-3 gap-3"></div>
+      </div>
+
+      <!-- 难度选择 -->
+      <div class="mt-5">
+        <p class="text-xs text-[var(--blood)] font-bold kicker mb-2">选择难度 →</p>
+        <div class="grid grid-cols-2 gap-3">
+          <button data-diff="normal" class="diff-btn btn border-2 rounded-xl px-3 py-3 text-left bg-white/70 border-[#e2d8c2]">
+            <p class="font-black serif">菜鸟实习生</p>
+            <p class="text-[11px] text-[var(--ink)]/60">默认玩法，普通节奏</p>
+          </button>
+          <button data-diff="hard" class="diff-btn btn border-2 rounded-xl px-3 py-3 text-left bg-white/70 border-[#e2d8c2]">
+            <p class="font-black serif">卷王模式 🔥</p>
+            <p class="text-[11px] text-[var(--ink)]/60">加入 Boss 战 · 20 秒限时选择</p>
+          </button>
+        </div>
+      </div>
+
+      <!-- 状态说明 -->
       <div class="grid grid-cols-3 gap-3 mt-6 text-center">
         <div class="rounded-xl bg-white/60 border border-[#e2d8c2] p-3">
           <span class="material-symbols-outlined text-[var(--olive)]">psychology</span>
@@ -133,6 +181,19 @@
         </div>
       </div>
 
+      <!-- 图鉴入口 -->
+      <div class="grid grid-cols-3 gap-3 mt-4">
+        <button id="btn-gallery-endings" class="btn rounded-xl bg-white/70 border border-[#e2d8c2] px-3 py-2 text-sm font-bold text-left">
+          🏁 结局 <span id="stat-endings" class="text-[var(--blood)] float-right">0/8</span>
+        </button>
+        <button id="btn-gallery-achv" class="btn rounded-xl bg-white/70 border border-[#e2d8c2] px-3 py-2 text-sm font-bold text-left">
+          🎖️ 成就 <span id="stat-achv" class="text-[var(--blood)] float-right">0/15</span>
+        </button>
+        <button id="btn-gallery-items" class="btn rounded-xl bg-white/70 border border-[#e2d8c2] px-3 py-2 text-sm font-bold text-left">
+          🎒 道具 <span id="stat-items" class="text-[var(--blood)] float-right">0/6</span>
+        </button>
+      </div>
+
       <div id="visitor-counter" class="mt-6 flex items-center justify-center gap-2 text-sm font-bold text-[var(--blood)]/80">
         <span class="material-symbols-outlined text-base">groups</span>
         <span>已有 <span id="visitor-count" class="serif font-black text-[var(--blood)] text-base">…</span> 位实习生亲历过 HJC · <a href="./stats.html" class="underline hover:text-[var(--blood)]">查看数据看板 →</a></span>
@@ -145,7 +206,7 @@
     </div>
   </section>
 
-  <!-- ===================== 游戏界面 ===================== -->
+  <!-- ============= 游戏界面 ============= -->
   <section id="screen-game" class="hidden">
     <!-- 状态栏 -->
     <div class="paper sticky top-2 z-40 rounded-2xl shadow-lg border border-[#d8cdb5] p-4 mb-5">
@@ -153,13 +214,18 @@
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-[var(--steel)]">event</span>
           <span class="font-black serif text-lg">第 <span id="stat-day">1</span> 天</span>
+          <span id="badge-diff" class="text-[10px] px-2 py-0.5 rounded-full bg-[var(--blood)]/10 text-[var(--blood)] font-bold hidden">卷王</span>
         </div>
-        <div class="text-right">
-          <span class="text-xs text-[var(--ink)]/60">累计到手</span>
-          <span class="font-black serif text-lg text-[var(--ochre)]"> ¥<span id="stat-money">0</span></span>
+        <div class="flex items-center gap-3">
+          <div class="text-right">
+            <span class="text-xs text-[var(--ink)]/60">累计到手</span>
+            <span class="font-black serif text-lg text-[var(--ochre)]"> ¥<span id="stat-money">0</span></span>
+          </div>
+          <button id="bagOpen" class="btn bg-white/70 border border-[#e2d8c2] rounded-full px-3 py-1.5 text-sm font-bold flex items-center gap-1 hover:border-[var(--blood)]/50">
+            🎒 <span id="bagBadge" class="text-[var(--blood)]">0</span>
+          </button>
         </div>
       </div>
-      <!-- sanity bar -->
       <div class="flex items-center gap-2 mb-2">
         <span class="material-symbols-outlined text-[var(--olive)] text-lg">psychology</span>
         <div class="flex-1 h-4 rounded-full bg-[#e6ddc9] overflow-hidden border border-[#d8cdb5]">
@@ -173,11 +239,11 @@
       </div>
     </div>
 
-    <!-- 场景卡片 -->
+    <!-- 场景卡片（可承载：普通剧情 / 随机事件 / Boss 战） -->
     <div id="scene" class="space-y-4"></div>
   </section>
 
-  <!-- ===================== 结算界面 ===================== -->
+  <!-- ============= 结算界面 ============= -->
   <section id="screen-end" class="hidden float-in">
     <div class="paper rounded-2xl shadow-2xl border border-[#d8cdb5] p-6 md:p-8 relative overflow-hidden scanline">
       <div class="absolute -right-3 top-4 stamp px-4 py-1 text-sm font-black serif" id="end-stamp">离职</div>
@@ -186,94 +252,199 @@
       <p class="text-[var(--steel)] mb-5" id="end-sub"></p>
 
       <div class="rounded-xl bg-white/70 border border-[#e2d8c2] divide-y divide-[#eadfc8] mb-5">
+        <div class="flex justify-between px-4 py-3"><span class="text-[var(--ink)]/70">身份 / 难度</span><span class="font-bold serif" id="end-identity">-</span></div>
         <div class="flex justify-between px-4 py-3"><span class="text-[var(--ink)]/70">坚持天数</span><span class="font-black serif"><span id="end-days">0</span> 天</span></div>
         <div class="flex justify-between px-4 py-3"><span class="text-[var(--ink)]/70">应得工资（150/天）</span><span class="font-bold serif text-[var(--olive)]">¥<span id="end-should">0</span></span></div>
         <div class="flex justify-between px-4 py-3"><span class="text-[var(--ink)]/70">实际到手</span><span class="font-bold serif text-[var(--steel)]">¥<span id="end-got">0</span></span></div>
-        <div class="flex justify-between px-4 py-3"><span class="text-[var(--ink)]/70">被 HJC 律师薅走 & 拖欠</span><span class="font-black serif text-[var(--blood)]">¥<span id="end-lost">0</span></span></div>
+        <div class="flex justify-between px-4 py-3"><span class="text-[var(--ink)]/70">被 HJC 律师薅走 &amp; 拖欠</span><span class="font-black serif text-[var(--blood)]">¥<span id="end-lost">0</span></span></div>
         <div class="flex justify-between px-4 py-3"><span class="text-[var(--ink)]/70">最终精神值</span><span class="font-black serif" id="end-sanity">0</span></div>
+        <div class="flex justify-between px-4 py-3"><span class="text-[var(--ink)]/70">证据收集</span><span class="font-bold serif" id="end-items">0 / 6</span></div>
       </div>
 
-      <div class="rounded-xl bg-[#2b2622] text-[#f4efe4] p-4 mb-5">
+      <div class="rounded-xl bg-[#2b2622] text-[#f4efe4] p-4 mb-4">
         <p class="text-xs text-[var(--ochre)] font-bold mb-1">📜 实习鉴定</p>
         <p class="text-[15px] leading-relaxed" id="end-verdict"></p>
       </div>
 
-      <div class="rounded-xl border-2 border-dashed border-[var(--blood)]/40 p-4 mb-6 bg-[var(--blood)]/5">
-        <p class="text-xs text-[var(--blood)] font-bold mb-1">🎖️ 解锁成就</p>
+      <div class="rounded-xl border-2 border-dashed border-[var(--blood)]/40 p-4 mb-4 bg-[var(--blood)]/5">
+        <p class="text-xs text-[var(--blood)] font-bold mb-1">🎖️ 结局成就</p>
         <p class="font-black serif text-lg" id="end-achv"></p>
       </div>
 
-      <div class="grid grid-cols-2 gap-3">
-        <button id="btn-restart" class="btn bg-[var(--ink)] hover:bg-black text-white font-bold py-3 rounded-xl">再受一次苦</button>
-        <button id="btn-share" class="btn bg-[var(--ochre)] hover:bg-[#b47a20] text-white font-bold py-3 rounded-xl">复制战绩转发</button>
+      <!-- 本局解锁成就 -->
+      <div id="end-newAchv" class="rounded-xl border-2 border-dashed border-[var(--olive)]/60 p-4 mb-5 bg-[var(--olive)]/5 hidden">
+        <p class="text-xs text-[var(--olive)] font-bold mb-2">✨ 本局解锁的其他成就</p>
+        <div id="end-newAchvList" class="grid grid-cols-1 gap-2"></div>
       </div>
-      <p id="share-tip" class="text-center text-xs text-[var(--olive)] mt-3 hidden">战绩已复制到剪贴板，快甩给你朋友 👀</p>
+
+      <!-- 分享卡预览 -->
+      <div class="rounded-xl bg-white/60 border border-[#e2d8c2] p-3 mb-5">
+        <p class="text-xs text-[var(--blood)] font-bold kicker mb-2">SHARE CARD · 分享卡</p>
+        <canvas id="shareCanvas" width="1080" height="1440" class="w-full rounded-lg border border-[#d8cdb5]" style="aspect-ratio:3/4"></canvas>
+        <p id="shareHintMobile" class="text-[11px] text-[var(--ink)]/60 mt-2 hidden">📱 长按图片可保存到相册</p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3">
+        <button id="btn-restart" class="btn bg-[var(--ink)] hover:bg-black text-white font-bold py-3 rounded-xl text-sm">再受一次</button>
+        <button id="btn-chat" class="btn bg-[var(--steel)] hover:bg-[#2c3644] text-white font-bold py-3 rounded-xl text-sm">🗨️ 微信复盘</button>
+        <button id="btn-share" class="btn bg-[var(--ochre)] hover:bg-[#b47a20] text-white font-bold py-3 rounded-xl text-sm">📥 下载卡片</button>
+      </div>
+      <button id="btn-copy" class="btn w-full mt-3 bg-white/60 border border-[#e2d8c2] hover:border-[var(--blood)]/50 text-[var(--ink)] font-bold py-2.5 rounded-xl text-sm">📋 复制文字战绩</button>
+      <p id="share-tip" class="text-center text-xs text-[var(--olive)] mt-3 hidden">已复制到剪贴板，快甩给你朋友 👀</p>
     </div>
-    <p class="text-center text-[11px] text-[var(--ink)]/40 mt-4">本作纯属黑色幽默虚构演绎，如有雷同……那多半是真的。</p>
+    <p class="text-center text-[11px] text-[var(--ink)]/40 mt-4">本作纯属黑色幽默虚构演绎，人物均为虚构，如有雷同……那多半是真的。</p>
+  </section>
+
+  <!-- ============= 微信聊天复盘 ============= -->
+  <section id="screen-chat" class="hidden float-in">
+    <div class="paper rounded-2xl shadow-2xl border border-[#d8cdb5] overflow-hidden">
+      <div class="bg-[#2b2622] text-[#f4efe4] p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-[var(--ochre)] grid place-items-center font-black serif text-[#2b2622]">H</div>
+          <div>
+            <p class="font-bold">HJC 律师</p>
+            <p class="text-[11px] text-white/60">对方正在输入……</p>
+          </div>
+        </div>
+        <button id="chatClose" class="text-white/70 hover:text-white"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div id="chatLog" class="wx p-4 space-y-3" style="min-height:60vh;max-height:70vh;overflow-y:auto"></div>
+      <div class="p-3 border-t border-[#d8cdb5] bg-white">
+        <div id="chatInputs" class="space-y-2"></div>
+      </div>
+    </div>
+    <p class="text-center text-[11px] text-[var(--ink)]/40 mt-3">聊天基于本地规则库应答，不接入真实大模型。</p>
+  </section>
+
+  <!-- ============= 图鉴 ============= -->
+  <section id="screen-gallery" class="hidden float-in">
+    <div class="paper rounded-2xl shadow-2xl border border-[#d8cdb5] p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <p class="kicker text-xs text-[var(--blood)] font-bold">GALLERY · 图鉴</p>
+          <h2 id="galleryTitle" class="serif font-black text-2xl">结局图鉴</h2>
+        </div>
+        <button id="galleryClose" class="btn bg-[var(--ink)] text-white px-4 py-2 rounded-xl text-sm font-bold">返回主页</button>
+      </div>
+      <div id="galleryBody"></div>
+      <button id="galleryReset" class="btn w-full mt-6 bg-white/70 border border-[#e2d8c2] text-[var(--blood)] font-bold py-2 rounded-xl text-sm hover:border-[var(--blood)]/50">🗑️ 清空所有存档（重置图鉴）</button>
+    </div>
   </section>
 
 </div>
 
 <script>
-/* =========================================================
-   律所实习生存模拟器 · HJC の噩梦
-   纯前端剧情逻辑
-   ========================================================= */
+/* ============================================================
+   律所实习生存模拟器 · HJC の噩梦 v2.0
+   单文件纯前端游戏 / 无后端 / GitHub Pages 部署
+   ============================================================ */
 
-// ---------- 埋点 & 计数（Abacus 免费公共计数服务，无需注册）----------
+/* ---------- 埋点：Abacus 免费公共计数服务 ---------- */
 const ABACUS_BASE = "https://abacus.jasoncameron.dev";
 const ABACUS_NS   = "hjc-sim-2026";
 function _hit(key){
   try{
     return fetch(ABACUS_BASE + "/hit/" + ABACUS_NS + "/" + encodeURIComponent(key), {mode:"cors"})
-      .then(r => r.ok ? r.json() : null)
-      .catch(()=>null);
+      .then(r => r.ok ? r.json() : null).catch(()=>null);
   }catch(e){ return Promise.resolve(null); }
 }
 function trackProfile(){
   try{
-    // 设备
     _hit(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "device_mobile" : "device_desktop");
-    // 语言 / 时区（大致地域画像）
     const lang = (navigator.language || "unknown").toLowerCase().split("-")[0];
     _hit("lang_" + lang);
     const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown").replace(/[^\w]/g,"_");
     _hit("tz_" + tz);
-    // 来源渠道（微信 / 飞书 / 直接 / 其他）
     const ref = (document.referrer || "").toLowerCase();
     let refType = "direct";
     if(!ref) refType = "direct";
     else if(ref.includes("weixin") || ref.includes("wechat") || ref.includes("qq.com")) refType = "wechat";
-    else if(ref.includes("feishu") || ref.includes("lark") || ref.includes("<company-lark-domain-3f9a4c1b>")) refType = "lark";
+    else if(ref.includes("feishu") || ref.includes("lark")) refType = "lark";
     else if(ref.includes("douyin") || ref.includes("tiktok") || ref.includes("xiaohongshu") || ref.includes("bilibili")) refType = "social";
     else refType = "other";
     _hit("refer_" + refType);
+    _hit("version_v2");
   }catch(e){}
 }
-// PV：页面加载即上报，返回总人数用于渲染计数器
 _hit("page_view").then(res => {
   const v = res && (res.value ?? res.count);
   const el = document.getElementById("visitor-count");
-  if(el){
-    if(typeof v === "number") el.textContent = v.toLocaleString();
-    else el.textContent = "??";
-  }
+  if(el){ el.textContent = (typeof v === "number") ? v.toLocaleString() : "??"; }
 });
 trackProfile();
 
-// ---------- 全局状态 ----------
-const state = {
-  day: 1,
-  sanity: 100,
-  money: 0,        // 实际到手
-  lost: 0,         // 被克扣 + 拖欠 + 垫付未还
-  peers: 7,
-  sceneIndex: 0,
+/* ---------- localStorage 存档（图鉴 / 打卡族） ---------- */
+const LS_KEY = "hjc_sim_v2_save";
+function loadSave(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return { endings:{}, achievements:{}, items:{}, dailyDates:[] };
+    const s = JSON.parse(raw);
+    return {
+      endings: s.endings || {},
+      achievements: s.achievements || {},
+      items: s.items || {},
+      dailyDates: s.dailyDates || [],
+    };
+  }catch(e){ return { endings:{}, achievements:{}, items:{}, dailyDates:[] }; }
+}
+function saveSave(s){ try{ localStorage.setItem(LS_KEY, JSON.stringify(s)); }catch(e){} }
+const SAVE = loadSave();
+// 打卡族记录（不同日期）
+(function markToday(){
+  try{
+    const today = new Date().toISOString().slice(0,10);
+    if(!SAVE.dailyDates.includes(today)){
+      SAVE.dailyDates.push(today);
+      if(SAVE.dailyDates.length > 30) SAVE.dailyDates = SAVE.dailyDates.slice(-30);
+      saveSave(SAVE);
+    }
+  }catch(e){}
+})();
+
+/* ---------- 常量 ---------- */
+const SHOULD_PER_DAY = 150;
+const BOSS_TIME_LIMIT = 20; // 秒
+
+/* ---------- 身份 ---------- */
+const IDENTITIES = {
+  fresh: {
+    id: "fresh",
+    name: "应届生",
+    icon: "🎓",
+    desc: "满怀憧憬，抗压一般",
+    initSanity: 100,
+    initMoney: 0,
+    tag: "默认",
+    quirk: "无特殊",
+    puaMultiplier: 1.0,
+  },
+  local: {
+    id: "local",
+    name: "二本法学",
+    icon: "📚",
+    desc: "早已看破，皮糙肉厚",
+    initSanity: 110,
+    initMoney: 0,
+    tag: "推荐",
+    quirk: "精神值上限 +10，PUA 伤害 -20%",
+    puaMultiplier: 0.8,
+    sanityCap: 110,
+  },
+  elite: {
+    id: "elite",
+    name: "名校卷王",
+    icon: "🏆",
+    desc: "自尊心炸裂，最容易破防",
+    initSanity: 90,
+    initMoney: 0,
+    tag: "困难",
+    quirk: "初始精神值 90，PUA 伤害 +30%",
+    puaMultiplier: 1.3,
+  },
 };
 
-const SHOULD_PER_DAY = 150; // 律所规定最低日薪
-
-// ---------- HJC 语录（随机弹幕 + 反馈）----------
+/* ---------- HJC 语录（PUA 弹幕） ---------- */
 const PUA_QUOTES = [
   "请你来是解决问题的，不是来学习的。",
   "这点活都嫌多？我当年通宵三天没喊过累。",
@@ -285,198 +456,421 @@ const PUA_QUOTES = [
   "砍价失败？那是你不会来事儿。",
   "年轻人吃点亏是福。",
   "你这情商，以后怎么当律师。",
+  "别老想着下班，我 40 岁还在加班呢。",
+  "这就是你的自愿加班承诺书，来签一下。",
 ];
 
-// ---------- 剧情关卡（八大名场面）----------
+/* ---------- 道具池 ---------- */
+const ITEMS = {
+  chat:    { id:"chat",    name:"聊天记录截图", icon:"💬", desc:"HJC 让你替他跟法院沟通的对话" },
+  bill:    { id:"bill",    name:"报销小票",     icon:"🧾", desc:"你垫付的打车、打印、调档费单据" },
+  clock:   { id:"clock",   name:"加班打卡截图", icon:"⏰", desc:"每天 21:00 之后仍在办公室的记录" },
+  scan:    { id:"scan",    name:"未签的实习协议扫描件", icon:"📄", desc:"所里明确要求第一天签，但从未下发" },
+  audio:   { id:"audio",   name:"录音笔录",     icon:"🎙️", desc:"「请你来不是学习的」经典语录母版" },
+  bank:    { id:"bank",    name:"日薪银行流水", icon:"🏦", desc:"到账金额明显低于所里最低日薪 150 元" },
+};
+
+/* ---------- 成就（15 个） ---------- */
+const ACHIEVEMENTS = {
+  first_break:   { id:"first_break",   name:"首日破防",       icon:"🧠", desc:"精神值第一次归零" },
+  wage_100:      { id:"wage_100",      name:"日薪破 100",     icon:"💸", desc:"单日到手工资触发到 100 元档" },
+  last_intern:   { id:"last_intern",   name:"组内老 8",       icon:"👤", desc:"坚持到组内实习生数量为 0（其他人全跑了）" },
+  bargain_pro:   { id:"bargain_pro",   name:"砍价大师",       icon:"💼", desc:"累计砍价成功 3 次" },
+  eq_match:      { id:"eq_match",      name:"情商匹配",       icon:"🤝", desc:"连续 2 次选出「顺着 HJC 说」" },
+  all_scenes:    { id:"all_scenes",    name:"六大名场面全见", icon:"🏛️", desc:"一局中走完全部 9 关剧情" },
+  night_warrior: { id:"night_warrior", name:"深夜战士",       icon:"🌙", desc:"一局中触发 3 次深夜/周末事件" },
+  slacker:       { id:"slacker",       name:"摆烂选手",       icon:"🛋️", desc:"一局中所有选项都选 C" },
+  evidence_king: { id:"evidence_king", name:"留证冠军",       icon:"⚖️", desc:"一局收集满 6 件证据道具" },
+  daily_checker: { id:"daily_checker", name:"打卡族",         icon:"📅", desc:"3 个不同日期打开过游戏" },
+  cheapskate:    { id:"cheapskate",    name:"骨折工资",       icon:"🦴", desc:"最终到手 ≤ 应得的 50%" },
+  fast_escape:   { id:"fast_escape",   name:"闪电逃离",       icon:"⚡", desc:"第 3 天之内触发逃离结局" },
+  full_stayer:   { id:"full_stayer",   name:"活死人",         icon:"💀", desc:"精神值 ≤ 20 时仍熬完全程" },
+  reverse_pua:   { id:"reverse_pua",   name:"反向 PUA",       icon:"🔥", desc:"连续 3 次选择「直接怼回去」类选项" },
+  collector:     { id:"collector",     name:"收藏家",         icon:"🗂️", desc:"累计发现全部 6 件证据道具（跨局）" },
+};
+
+/* ---------- 剧情主线 SCENES（9 关） ---------- */
 const SCENES = [
-  // 事迹5 —— 入职：不签协议、不买工伤险
-  {
-    day: 1,
-    tag: "契约意识 · Ⅰ",
-    title: "入职第一天：消失的合同",
-    narrative: "所里规定，实习第一天必须签好实习协议、买好工伤保险。你满怀期待地问HJC 律师要合同。",
-    boss: "协议？保险？咱们都是自己人，先干活嘛，这些后面再补，误不了你的。",
-    choices: [
-      { text: "坚持：所里要求今天必须签，麻烦您走个流程。", sanity:-12, money:0, lost:0,
-        result: "他脸一沉，嘴里念叨「刚来就讲条件，格局小了」。合同？没有下文。", pua:true, peers:0 },
-      { text: "算了，先干活吧，别得罪带教。", sanity:-6, money:0, lost:0,
-        result: "你放弃了签约。一颗名为「没保障」的雷，就此埋下。", pua:false, peers:0 },
-      { text: "偷偷把「未签协议」记进备忘录，留证据。", sanity:-2, money:0, lost:0,
-        result: "机智！你默默截图留痕。虽然改变不了现状，但至少心里有底。", pua:false, peers:0 },
+  { day:1, tag:"契约意识 · Ⅰ", title:"入职第一天：消失的合同",
+    narrative:"所里规定，实习第一天必须签好实习协议、买好工伤保险。你满怀期待地问HJC 律师要合同。",
+    boss:"协议？保险？咱们都是自己人，先干活嘛，这些后面再补，误不了你的。",
+    choices:[
+      { text:"坚持：所里要求今天必须签，麻烦您走个流程。", sanity:-12, item:"scan", tags:["confront"],
+        result:"他脸一沉，嘴里念叨「刚来就讲条件，格局小了」。合同？没有下文。但你机智地把这段对话截了图。", pua:true },
+      { text:"算了，先干活吧，别得罪带教。", sanity:-6, tags:["obey"],
+        result:"你放弃了签约。一颗名为「没保障」的雷，就此埋下。", pua:false },
+      { text:"偷偷把「未签协议」记进备忘录 + 拍照留证。", sanity:-2, item:"scan", tags:["slack"],
+        result:"机智！你默默截图留痕。虽然改变不了现状，但至少心里有底。", pua:false },
     ],
   },
-
-  // 事迹1 —— 一天立8个案子还嫌你慢
-  {
-    day: 2,
-    tag: "无限工作量 · Ⅰ",
-    title: "立案狂潮",
-    narrative: "早上九点，HJC 律师甩给你八个案子的立案材料，要求今天全部搞定，附赠一句「抓紧」。",
-    boss: "今天这八个案子必须立完。别磨蹭，请你来是干活的。",
-    choices: [
-      { text: "硬着头皮全接了，中午饭都没吃。", sanity:-15, money:0, lost:0,
-        result: "你八点半才立完最后一个，累到眼前发黑。他瞥了一眼：「才立完？效率太低了。」", pua:true, peers:0 },
-      { text: "委婉提出：八个有点多，能不能分两天？", sanity:-10, money:0, lost:0,
-        result: "「两天？你当这是养老院呢？」你被当场上了一课。", pua:true, peers:0 },
-      { text: "拉上同组实习生一起分工干。", sanity:-6, money:0, lost:0, peers:-1,
-        result: "你们几个实习生互帮互助勉强扛住。但有个同伴当天就提了离职。", pua:false },
+  { day:2, tag:"无限工作量 · Ⅰ", title:"立案狂潮",
+    narrative:"早上九点，HJC 律师甩给你八个案子的立案材料，要求今天全部搞定，附赠一句「抓紧」。",
+    boss:"今天这八个案子必须立完。别磨蹭，请你来是干活的。",
+    choices:[
+      { text:"硬着头皮全接了，中午饭都没吃。", sanity:-15, item:"clock", tags:["obey"],
+        result:"你八点半才立完最后一个，累到眼前发黑。他瞥了一眼：「才立完？效率太低了。」你的加班打卡截图倒是攒了一堆。", pua:true },
+      { text:"直接怼回去：一天 8 个案子不符合流程。", sanity:-10, tags:["confront"],
+        result:"「你翅膀硬了？」你被当场上了一课，但至少表达了立场。", pua:true },
+      { text:"拉上同组实习生一起分工干。", sanity:-6, peers:-1, tags:["slack"],
+        result:"你们几个实习生互帮互助勉强扛住。但有个同伴当天就提了离职。", pua:false },
     ],
   },
-
-  // 事迹1 —— 替他和法院、当事人沟通
-  {
-    day: 3,
-    tag: "无限工作量 · Ⅱ",
-    title: "沟通替身",
-    narrative: "本该HJC 律师亲自对接的法院和当事人，全被丢给了你。当事人一个电话打来，情绪激动地要说法。",
-    boss: "这个当事人你去对接，法院那边也是你跑。我忙，没空。",
-    choices: [
-      { text: "冒充「HJC 律师助理」，硬着头皮安抚当事人。", sanity:-14, money:0, lost:0,
-        result: "当事人骂了你二十分钟，你还得赔笑。挂电话时手都在抖。", pua:false, peers:0 },
-      { text: "如实说「我只是实习生，做不了主」。", sanity:-8, money:0, lost:0,
-        result: "当事人更炸了，投诉到HJC 律师那。他反手怪你「不会说话」。", pua:true, peers:0 },
-      { text: "把当事人的诉求整理成文档甩回给他。", sanity:-4, money:0, lost:0,
-        result: "他扫了一眼：「这不还得我看？你整理它干嘛？」——但至少你没背锅。", pua:false, peers:0 },
+  { day:3, tag:"无限工作量 · Ⅱ", title:"沟通替身",
+    narrative:"本该HJC 律师亲自对接的法院和当事人，全被丢给了你。当事人一个电话打来，情绪激动地要说法。",
+    boss:"这个当事人你去对接，法院那边也是你跑。我忙，没空。",
+    choices:[
+      { text:"冒充「HJC 律师助理」，硬着头皮安抚当事人。", sanity:-14, item:"chat", tags:["obey"],
+        result:"当事人骂了你二十分钟，你还得赔笑。挂电话时手都在抖。你顺手保留了通话记录截图。", pua:false },
+      { text:"如实说「我只是实习生，做不了主」。", sanity:-8, tags:["confront"],
+        result:"当事人更炸了，投诉到HJC 律师那。他反手怪你「不会说话」。", pua:true },
+      { text:"把当事人诉求整理成文档甩回给他。", sanity:-4, tags:["slack"],
+        result:"他扫了一眼：「这不还得我看？你整理它干嘛？」——但至少你没背锅。", pua:false },
     ],
   },
-
-  // 事迹3 —— 请教被怼
-  {
-    day: 4,
-    tag: "带教黑洞",
-    title: "请教被怼",
-    narrative: "遇到一个专业问题，你想不明白，鼓起勇气去请教带教老师HJC 律师。",
-    boss: "这个啊……（沉默三秒）你自己查嘛。请你来是解决问题的，不是来学习的。",
-    choices: [
-      { text: "追问：那这个思路对不对，您给把个关？", sanity:-13, money:0, lost:0,
-        result: "他不耐烦地摆手：「我哪知道，你别问我。」——原来他自己也不会。", pua:true, peers:0 },
-      { text: "默默去问同组实习生和度娘。", sanity:-3, money:0, lost:0,
-        result: "同伴比带教靠谱多了。你们互相成了彼此唯一的老师。", pua:false, peers:0 },
-      { text: "心态崩了，去茶水间站了五分钟。", sanity:-6, money:0, lost:0,
-        result: "你望着窗外，认真思考了一下人生和法考的意义。", pua:false, peers:0 },
+  { day:4, tag:"带教黑洞", title:"请教被怼",
+    narrative:"遇到一个专业问题，你想不明白，鼓起勇气去请教带教老师HJC 律师。",
+    boss:"这个啊……（沉默三秒）你自己查嘛。请你来是解决问题的，不是来学习的。",
+    choices:[
+      { text:"追问：那这个思路对不对，您给把个关？", sanity:-13, item:"audio", tags:["confront"],
+        result:"他不耐烦地摆手：「我哪知道，你别问我。」——原来他自己也不会。你悄悄按了录音。", pua:true },
+      { text:"默默去问同组实习生和度娘。", sanity:-3, tags:["slack"],
+        result:"同伴比带教靠谱多了。你们互相成了彼此唯一的老师。", pua:false },
+      { text:"心态崩了，去茶水间站了五分钟。", sanity:-6, tags:["slack"],
+        result:"你望着窗外，认真思考了一下人生和法考的意义。", pua:false },
     ],
   },
-
-  // 事迹2 —— 情商黑洞，听不懂人话
-  {
-    day: 5,
-    tag: "沟通结界",
-    title: "鸡同鸭讲",
-    narrative: "你把一份紧急情况汇报给HJC 律师，反复解释了三遍，他就是 get 不到重点，还顺着自己的理解一通输出。",
-    boss: "你到底想说啥？说重点！……哦你是这个意思？（其实完全理解反了）",
-    choices: [
-      { text: "换更简单的话再解释第四遍。", sanity:-11, money:0, lost:0,
-        result: "第四遍他终于懂了，然后怪你「怎么不早说清楚」。你的血压升到了顶点。", pua:true, peers:0 },
-      { text: "画个图 + 写成一二三条发给他。", sanity:-5, money:0, lost:0,
-        result: "图文并茂他总算懂了。你悟了：和他沟通得用「说明书」级别的降维。", pua:false, peers:0 },
-      { text: "算了，按自己的判断先处理。", sanity:-8, money:0, lost:0,
-        result: "你自作主张处理了，虽然处理对了，但他嫌你「擅自做主」。左右不是人。", pua:true, peers:0 },
+  { day:5, tag:"沟通结界", title:"鸡同鸭讲",
+    narrative:"你把一份紧急情况汇报给HJC 律师，反复解释了三遍，他就是 get 不到重点，还顺着自己的理解一通输出。",
+    boss:"你到底想说啥？说重点！……哦你是这个意思？（其实完全理解反了）",
+    choices:[
+      { text:"换更简单的话再解释第四遍。", sanity:-11, tags:["obey"],
+        result:"第四遍他终于懂了，然后怪你「怎么不早说清楚」。你的血压升到了顶点。", pua:true },
+      { text:"画个图 + 写成一二三条发给他。", sanity:-5, tags:["slack"],
+        result:"图文并茂他总算懂了。你悟了：和他沟通得用「说明书」级别的降维。", pua:false },
+      { text:"算了，按自己的判断先处理。", sanity:-8, tags:["confront"],
+        result:"你自作主张处理了，虽然处理对了，但他嫌你「擅自做主」。左右不是人。", pua:true },
     ],
   },
-
-  // 事迹4 —— 抠门，日薪100，抠中饭钱
-  {
-    day: 6,
-    tag: "抠门刺客",
-    title: "午饭刺客",
-    narrative: "发薪日到了。所里最低日薪是 150，你算了算，卡里到账竟然只有 100 出头。一问才知道——他把「请你吃的中饭」从你工资里抠了。",
-    boss: "中午那顿盒饭是我请的？那不得算你头上。100 已经不少了，隔壁所才 80。",
-    choices: [
-      { text: "据理力争：所里明明规定最低 150。", sanity:-12, money:100, lost:50,
-        result: "他打太极：「预算紧张，先这样，以后涨。」——你心知肚明，不会有以后。", pua:true, peers:0 },
-      { text: "忍了，默默把 100 收下。", sanity:-9, money:110, lost:40,
-        result: "你不想撕破脸。看着组里 7 个实习生，他一个月省下的钱够买台新车。", pua:false, peers:0 },
-      { text: "以后自己带饭，一分不让他抠。", sanity:-4, money:120, lost:30,
-        result: "自带便当反击成功！他还阴阳你「这么节俭，有前途」。", pua:true, peers:0 },
+  { day:6, tag:"抠门刺客", title:"午饭刺客",
+    narrative:"发薪日到了。所里最低日薪是 150，你算了算，卡里到账竟然只有 100 出头。一问才知道——他把「请你吃的中饭」从你工资里抠了。",
+    boss:"中午那顿盒饭是我请的？那不得算你头上。100 已经不少了，隔壁所才 80。",
+    choices:[
+      { text:"据理力争：所里明明规定最低 150。", sanity:-12, money:100, lost:50, item:"bank", tags:["confront"],
+        result:"他打太极：「预算紧张，先这样，以后涨。」——你心知肚明，不会有以后。你把银行到账截图存了。", pua:true },
+      { text:"忍了，默默把 100 收下。", sanity:-9, money:110, lost:40, tags:["obey"],
+        result:"你不想撕破脸。看着组里 7 个实习生，他一个月省下的钱够买台新车。", pua:false },
+      { text:"以后自己带饭，一分不让他抠。", sanity:-4, money:120, lost:30, tags:["slack"],
+        result:"自带便当反击成功！他还阴阳你「这么节俭，有前途」。", pua:true },
     ],
   },
-
-  // 事迹6 —— 砍价修罗场
-  {
-    day: 7,
-    tag: "销售修罗场",
-    title: "砍价修罗场",
-    narrative: "今天你不是实习生，是销售。HJC 律师让你去和外地律师砍「调档、出庭」的价，目标是远低于市场价。砍不下来他 PUA 你，砍下来他还要你继续砍。",
-    boss: "这个价太贵了，你去砍，砍到市场价一半。砍不下来就是你不会来事儿。",
-    choices: [
-      { text: "厚着脸皮开砍，磨了对方一下午。", sanity:-13, money:0, lost:0,
-        result: "你砍下来 30%。他：「还能再砍，你继续。」——砍价没有终点，只有更低。", pua:true, peers:0 },
-      { text: "砍不动，如实回复。", sanity:-15, money:0, lost:0,
-        result: "「连个价都砍不下来，你还能干啥？」你被 PUA 得怀疑人生。", pua:true, peers:0 },
-      { text: "私下跟外地律师道歉：我也是被逼的。", sanity:-5, money:0, lost:0,
-        result: "对方律师懂了，友情价成交。同行何苦为难同行，你俩加了微信。", pua:false, peers:0 },
+  { day:7, tag:"销售修罗场", title:"砍价修罗场",
+    narrative:"今天你不是实习生，是销售。HJC 律师让你去和外地律师砍「调档、出庭」的价，目标是远低于市场价。砍不下来他 PUA 你，砍下来他还要你继续砍。",
+    boss:"这个价太贵了，你去砍，砍到市场价一半。砍不下来就是你不会来事儿。",
+    choices:[
+      { text:"厚着脸皮开砍，磨了对方一下午。", sanity:-13, tags:["obey","bargain"],
+        result:"你砍下来 30%。他：「还能再砍，你继续。」——砍价没有终点，只有更低。", pua:true },
+      { text:"砍不动，如实回复。", sanity:-15, tags:["confront"],
+        result:"「连个价都砍不下来，你还能干啥？」你被 PUA 得怀疑人生。", pua:true },
+      { text:"私下跟外地律师道歉：我也是被逼的。", sanity:-5, tags:["slack","bargain"],
+        result:"对方律师懂了，友情价成交。同行何苦为难同行，你俩加了微信。", pua:false },
     ],
   },
-
-  // 事迹5 —— 报销罗生门 + 拖欠
-  {
-    day: 8,
-    tag: "契约意识 · Ⅱ",
-    title: "报销罗生门",
-    narrative: "这些天你自掏腰包垫付了打车、打印、调档一堆费用。你拿着单据去找HJC 律师报销，结果……",
-    boss: "报销啊？你先放这，我看看。（一周后）啥单据？我没收到啊。上个月工资？财务在弄了。",
-    choices: [
-      { text: "天天追着要，把他堵在工位。", sanity:-14, money:0, lost:300,
-        result: "追了半个月，报销款和拖欠工资依旧遥遥无期。你成了办公室「讨薪钉子户」。", pua:true, peers:0 },
-      { text: "把聊天记录、单据整理归档，准备维权。", sanity:-4, money:0, lost:300,
-        result: "你留好了全部证据链。虽然钱还没到，但你已经想好去哪儿投诉了。", pua:false, peers:0 },
-      { text: "认栽，就当花钱买了个教训。", sanity:-10, money:0, lost:350,
-        result: "你决定不要了。这几百块，成了你人生第一堂「识人」学费。", pua:false, peers:0 },
+  { day:8, tag:"契约意识 · Ⅱ", title:"报销罗生门",
+    narrative:"这些天你自掏腰包垫付了打车、打印、调档一堆费用。你拿着单据去找HJC 律师报销，结果……",
+    boss:"报销啊？你先放这，我看看。（一周后）啥单据？我没收到啊。上个月工资？财务在弄了。",
+    choices:[
+      { text:"天天追着要，把他堵在工位。", sanity:-14, lost:300, tags:["confront"],
+        result:"追了半个月，报销款和拖欠工资依旧遥遥无期。你成了办公室「讨薪钉子户」。", pua:true },
+      { text:"把聊天记录、单据整理归档，准备维权。", sanity:-4, lost:300, item:"bill", tags:["slack"],
+        result:"你留好了全部证据链。虽然钱还没到，但你已经想好去哪儿投诉了。", pua:false },
+      { text:"认栽，就当花钱买了个教训。", sanity:-10, lost:350, tags:["obey"],
+        result:"你决定不要了。这几百块，成了你人生第一堂「识人」学费。", pua:false },
     ],
   },
-
-  // 终局抉择
-  {
-    day: 9,
-    tag: "命运的十字路口",
-    title: "去，还是留？",
-    narrative: "一周多下来，你身心俱疲。组里的实习生走了一个又一个。此刻，HJC 律师又拍了拍你的肩膀。",
-    boss: "小伙子不错，有潜力。留下来跟着我好好干，前途无量。",
-    final: true,
-    choices: [
-      { text: "潇洒递交离职，头也不回。", sanity:10, money:0, lost:0, ending:"escape",
-        result: "你笑着把工牌拍在桌上：告辞。走出律所那一刻，阳光都变香了。" },
-      { text: "留下来，试图「改变」这一切。", sanity:-20, money:0, lost:0, ending:"stay",
-        result: "你天真地以为能感化他……三个月后，你成了下一个「讨薪钉子户」。" },
-      { text: "留证据 + 离职 + 一纸投诉信寄给律所和劳动局。", sanity:18, money:0, lost:0, ending:"justice",
-        result: "你不仅全身而退，还把这些天攒下的证据递了上去。江湖再见，HJC 律师。" },
+  { day:9, tag:"命运的十字路口", title:"去，还是留？",
+    narrative:"一周多下来，你身心俱疲。组里的实习生走了一个又一个。此刻，HJC 律师又拍了拍你的肩膀。",
+    boss:"小伙子不错，有潜力。留下来跟着我好好干，前途无量。",
+    final:true,
+    choices:[
+      { text:"潇洒递交离职，头也不回。", sanity:10, ending:"escape", tags:["confront"],
+        result:"你笑着把工牌拍在桌上：告辞。走出律所那一刻，阳光都变香了。" },
+      { text:"留下来，试图「改变」这一切。", sanity:-20, ending:"stay", tags:["obey"],
+        result:"你天真地以为能感化他……三个月后，你成了下一个「讨薪钉子户」。" },
+      { text:"举证维权：留证 + 离职 + 投诉信寄给所里 + 劳动局。", sanity:18, ending:"justice", tags:["confront"], requireItems:3,
+        result:"你不仅全身而退，还把这些天攒下的证据递了上去。江湖再见，HJC 律师。" },
+      { text:"（隐藏）继续熬 + 反向卷成下一个 HJC。", sanity:-30, ending:"become", tags:["obey"], requireStreak:"obey3",
+        result:"你熬完了。三年后，你也开始扣实习生的中饭钱。恭喜，你成了下一个 HJC。" },
     ],
   },
 ];
 
-// ---------- DOM ----------
+/* ---------- 随机事件（12 条） ---------- */
+const EVENTS = [
+  { id:"midnight_wechat", tag:"深夜微信 🌙", night:true,
+    title:"23:47，微信响了",
+    boss:"材料明早 9 点要，你现在能不能改一下？",
+    choices:[
+      { text:"回：好的老师，马上改。", sanity:-10, item:"clock", tags:["obey"],
+        result:"你熬到 2 点半才交上去。第二天他 9:30 才起。" },
+      { text:"装死不回。", sanity:-4, tags:["slack"],
+        result:"第二天他阴阳你：「昨晚你手机没电了？」" },
+    ],
+  },
+  { id:"sunday_call", tag:"周日电话 📞", night:true,
+    title:"周日 15:00，铃声响起",
+    boss:"过来加个班，就 1 小时。",
+    choices:[
+      { text:"忍着往律所跑。", sanity:-12, item:"clock", tags:["obey"],
+        result:"「就 1 小时」实际上是 6 小时。你的周末彻底报废。" },
+      { text:"回：不好意思，我在外地。", sanity:-6, tags:["confront"],
+        result:"他 45 秒内回：「行吧，你自己看着办。」——你悟到了下周的绩效。" },
+    ],
+  },
+  { id:"reimburse_reject", tag:"报销拉锯 🧾",
+    title:"报销单被打回",
+    boss:"打车 42 元太多了，公交行不行？",
+    choices:[
+      { text:"解释：从法院到所里没直达公交。", sanity:-8, tags:["confront"],
+        result:"他挥挥手：「以后你走过去。」——单据依旧没报。" },
+      { text:"忍了，改成 12 元公交。", sanity:-10, lost:30, item:"bill", tags:["obey"],
+        result:"你自己吞了差价。这张单据你留了下来。" },
+    ],
+  },
+  { id:"friend_forward", tag:"洗脑鸡汤 📣",
+    title:"HJC 转发了「优秀实习生都是不睡觉的」",
+    boss:"@全体成员 学习一下！",
+    choices:[
+      { text:"点赞 + 转发朋友圈。", sanity:-6, tags:["obey"],
+        result:"HJC 转头夸你「悟性不错」。你在评论区把自己拉黑了。" },
+      { text:"当没看见。", sanity:-2, tags:["slack"],
+        result:"半小时后他在群里 @你：「怎么没人回应？」" },
+      { text:"截图存档，未来投诉素材 +1。", sanity:0, item:"chat", tags:["confront"],
+        result:"你把这条微信截图收进了证据夹。" },
+    ],
+  },
+  { id:"peer_dump", tag:"同伴甩锅 🙄",
+    title:"组内同事甩锅",
+    boss:"（同组实习生）这个立案你帮我一下嘛，我今天有事。",
+    choices:[
+      { text:"帮，同伴的忙不帮说不过去。", sanity:-6, peers:0, tags:["obey"],
+        result:"你替他跑了法院。他晚上朋友圈：「今天太累了」。" },
+      { text:"拒绝：我今天也满档了。", sanity:-3, peers:-1, tags:["confront"],
+        result:"他 emo 了两天，之后没再跟你说过话。" },
+    ],
+  },
+  { id:"biz_backup", tag:"陪谈业务 🕴️",
+    title:"HJC 让你陪去谈业务",
+    boss:"不用你说话，主要是撑场面。",
+    choices:[
+      { text:"跟着去，全程沉默微笑。", sanity:-8, tags:["obey"],
+        result:"你陪坐了 3 小时。回来 HJC 让你写会谈纪要。" },
+      { text:"以身体不适请假。", sanity:-4, tags:["slack"],
+        result:"HJC 皱眉：「你这身体，以后怎么做律师。」" },
+    ],
+  },
+  { id:"printer_jam", tag:"打印机命案 🖨️",
+    title:"打印机卡纸，领导路过",
+    boss:"你连打印机都搞不定？",
+    choices:[
+      { text:"耐心拆机排查。", sanity:-4, tags:["slack"],
+        result:"你花 5 分钟修好了。HJC 没再说话。" },
+      { text:"辩解：这台机器有问题，不是我。", sanity:-9, tags:["confront"],
+        result:"「借口真多。」他甩下这句就走了。" },
+    ],
+  },
+  { id:"overhear", tag:"会议室偷听 👂",
+    title:"你偶然听到 HJC 骂另一个实习生",
+    boss:"（隔壁传来）你这也做不好，那也做不好，我要你干嘛？",
+    choices:[
+      { text:"悄悄按下录音键。", sanity:-3, item:"audio", tags:["slack"],
+        result:"这段录音，将来说不定用得上。" },
+      { text:"进去打断：我有个事请教您。", sanity:-8, tags:["confront"],
+        result:"你替同伴解了围，但 HJC 记住了你。" },
+    ],
+  },
+  { id:"voluntary_ot", tag:"自愿加班承诺 🖋️",
+    title:"「自愿加班承诺书」",
+    boss:"签一下，走个流程。",
+    choices:[
+      { text:"我不签。", sanity:-10, tags:["confront"],
+        result:"他脸黑了：「其他人都签了，就你事多。」" },
+      { text:"签了，反正也没啥法律效力。", sanity:-6, item:"scan", tags:["obey"],
+        result:"你签了，然后偷偷把这份承诺书拍了下来——未来的举证素材。" },
+    ],
+  },
+  { id:"court_close", tag:"法院关门 3 分钟 🏛️",
+    title:"法院立案窗口关门 3 分钟前",
+    boss:"（电话追过来）到了没？搞不好这个立案你负责。",
+    choices:[
+      { text:"疯狂冲刺，卡点递上材料。", sanity:-12, item:"clock", tags:["obey"],
+        result:"你跑到吐，勉强立上。工作人员甩了个白眼。" },
+      { text:"淡定放弃，明天再来。", sanity:-8, tags:["slack"],
+        result:"HJC 在电话里骂了 5 分钟。你的耳朵嗡嗡的。" },
+    ],
+  },
+  { id:"aa_dinner", tag:"聚餐 AA 🍜",
+    title:"组里 8 人聚餐",
+    boss:"AA 吧，年轻人别老蹭老板。",
+    choices:[
+      { text:"心里 MMP，脸上笑嘻嘻。", sanity:-10, lost:80, tags:["obey"],
+        result:"人均 80，你的日薪当场归零。" },
+      { text:"以身体不适先撤。", sanity:-4, tags:["slack"],
+        result:"你回家煮了泡面，居然吃得很香。" },
+    ],
+  },
+  { id:"client_call", tag:"当事人越级电话 📞",
+    title:"客户电话打到你手机",
+    boss:"（客户）你到底是怎么办案的？给我个说法！",
+    choices:[
+      { text:"耐心解释了 40 分钟。", sanity:-13, tags:["obey"],
+        result:"客户挂了，你也挂了——瘫在椅子上。" },
+      { text:"直接怼回：这个案子不是我在办，请找 HJC 律师。", sanity:-6, tags:["confront"],
+        result:"你把电话甩过去了。HJC 事后说你「不会处理」。" },
+    ],
+  },
+];
+
+/* ---------- Boss 战（卷王模式追加 3 关） ---------- */
+const BOSSES = [
+  { id:"week_review", after:3, tag:"周会 Review 💣",
+    title:"周会：HJC 当众点你",
+    boss:"这周你都干了些啥？20 秒之内说出三个亮点。",
+    choices:[
+      { text:"我这周完成了 8 个立案 + 2 次调档 + 1 次庭审陪同。", sanity:-6, tags:["confront"] },
+      { text:"（沉默）……老师我记不清了。", sanity:-16, tags:["obey"] },
+      { text:"（反问）您能先分享一下您这周的成果吗？", sanity:-8, tags:["confront"], item:"audio" },
+    ],
+    timeout: { text:"超时未答", sanity:-20, tags:["obey"] },
+  },
+  { id:"trial_bomb", after:6, tag:"临时庭审 ⚖️",
+    title:"临时接到「陪同庭审」通知",
+    boss:"20 秒后你必须出门，材料自己带齐。",
+    choices:[
+      { text:"抱起卷宗夺门而出，路上边跑边翻。", sanity:-10, item:"clock", tags:["obey"] },
+      { text:"提出：庭审我没准备，无法出席。", sanity:-15, tags:["confront"] },
+      { text:"甩给另一个实习生，让他顶替。", sanity:-6, peers:-1, tags:["slack"] },
+    ],
+    timeout: { text:"超时未答", sanity:-18, tags:["obey"] },
+  },
+  { id:"filing_race", after:9, tag:"立案闭门倒计时 🏛️",
+    title:"「20 秒内决定：今天到底立不立」",
+    boss:"选一个：赌一把，还是甩锅？",
+    choices:[
+      { text:"冲刺立案，赌今日立完。", sanity:-8, item:"clock", tags:["obey"] },
+      { text:"改成明天，让 HJC 顶锅。", sanity:-12, tags:["confront"] },
+    ],
+    timeout: { text:"超时未答", sanity:-20, tags:["obey"] },
+  },
+];
+
+/* ---------- 结局（5 明 + 3 隐） ---------- */
+const ENDINGS = {
+  collapse: { hidden:false, title:"精神崩溃，中途离场", sub:"你的精神值归零了。走出律所大门时，你连哭的力气都没有。",
+    verdictFn: s => "该实习生在高强度 PUA 环境下坚持了 " + s.day + " 天，虽未走完全程，但及时止损、保住了心理健康的底线，理性得分满分。",
+    achv:"🧠 及时止损 ·「留得青山在」", stamp:"崩溃", color:"#a6231d" },
+  escape:   { hidden:false, title:"潇洒逃离，全身而退", sub:"你头也不回地走了。这不是失败，这是清醒。",
+    verdictFn: s => "该实习生识人精准、决断果敢，在被彻底榨干之前果断离场。这段经历将成为你简历里最值得吹的「避坑能力」。",
+    achv:"🏃 极速逃脱 ·「阳光都变香了」", stamp:"逃离", color:"#5f6b3c" },
+  stay:     { hidden:false, title:"天真留守，越陷越深", sub:"你以为能改变他……结局你已经知道了。",
+    verdictFn: s => "该实习生善良且有理想，可惜好心遇上了老油条。请记住：你无法叫醒一个装睡的人，更无法感化一个装穷的老板。",
+    achv:"💔 感化失败 ·「下一个讨薪钉子户」", stamp:"沦陷", color:"#3c4a5a" },
+  justice:  { hidden:false, title:"留证维权，江湖再见", sub:"你不仅跑了，还顺手把证据递了上去。",
+    verdictFn: s => "该实习生兼具情商、证据意识与反击勇气，堪称「打工人复仇者联盟」典范。收齐 " + s.itemsCount + " 件证据，条条见血。",
+    achv:"⚖️ 正义使者 ·「留痕即是力量」", stamp:"维权", color:"#c98a2b" },
+  survive:  { hidden:false, title:"熬满全程，虽败犹荣", sub:"八大名场面你全经历了，居然还活着。",
+    verdictFn: s => "该实习生以惊人的意志力熬完了全部关卡。这份抗压能力放在任何正常单位都是宝藏，可惜遇上了 HJC。",
+    achv:"🛡️ 钢铁之躯 ·「什么妖魔鬼怪都见过」", stamp:"幸存", color:"#241f1a" },
+  bureau:   { hidden:true,  title:"隐藏结局 · 司法局约谈 HJC", sub:"你收齐了 5 件以上证据，投诉信到了律协和司法局。",
+    verdictFn: s => "该实习生启动 Boss Kill 模式：证据 " + s.itemsCount + " 件、录音 + 银行流水 + 未签协议一起递交。据说 HJC 被约谈那天，走出办公楼时手都在抖。",
+    achv:"🏛️ Boss Kill ·「法律面前人人平等，包括 HJC」", stamp:"约谈", color:"#7c1611" },
+  reverse:  { hidden:true,  title:"隐藏结局 · 反向 PUA", sub:"你连续 3 次直接怼回去，HJC 破防了。",
+    verdictFn: s => "该实习生完成了「情绪反噬」：面对 PUA 不再自我怀疑，转而输出金句让 HJC 无言以对。心理学教科书级别的边界感示范。",
+    achv:"🔥 反向 PUA ·「你先照照镜子」", stamp:"反杀", color:"#a6231d" },
+  become:   { hidden:true,  title:"隐藏结局 · 你成了下一个 HJC", sub:"你熬完了。三年后，你也开始扣实习生的中饭钱。",
+    verdictFn: s => "该实习生黑化上岸，掌握了「PUA · 抠门 · 拖欠 · 甩锅」四大心法。恭喜，你已经具备开一家 HJC 分号的能力。",
+    achv:"👑 传承者 ·「原来这就是律师的赚钱之道」", stamp:"黑化", color:"#241f1a" },
+};
+
+/* ---------- HJC 聊天规则库 ---------- */
+const CHAT_RULES = [
+  { keys:["工资","日薪","钱","报销","薪水","150"],
+    replies:["预算紧张，先这样，以后涨。","中午那顿盒饭是我请的？那不得算你头上。","别整天想着钱，格局要大一点。"] },
+  { keys:["协议","合同","保险","工伤"],
+    replies:["签什么协议，咱们都是自己人。","保险后面再补，误不了你的。","你刚来就讲这些，格局小了。"] },
+  { keys:["加班","晚上","周末","休息"],
+    replies:["优秀的实习生都是不睡觉的。","别老想着下班，我 40 岁还在加班呢。","这就是自愿加班承诺书，签一下。"] },
+  { keys:["学习","请教","教","不会","问题"],
+    replies:["请你来是解决问题的，不是来学习的。","这个啊……你自己查嘛。","这么简单的事你都要问我？"] },
+  { keys:["投诉","劳动局","律协","司法局","证据","维权"],
+    replies:["……","（沉默三秒）你确定要闹到那种程度？","咱们都是自己人，何必呢。"] },
+  { keys:["离职","辞职","不干","走了","不做了"],
+    replies:["年轻人吃点亏是福。","走可以，走前把手上的活都交接完。","你这情商，出去以后怎么当律师？"] },
+];
+const CHAT_DEFAULT_REPLIES = [
+  "你到底想说啥？说重点！",
+  "效率太低了，隔壁小王一秒能打三段。",
+  "这么简单的事你都要问我？",
+  "别整天想着钱，格局要大一点。",
+  "请你来是解决问题的，不是来学习的。",
+];
+const CHAT_USER_OPTIONS = [
+  "老师，我这个月工资怎么还没到？",
+  "老师，实习协议什么时候能签？",
+  "老师，报销的钱您帮我看看。",
+  "老师，这个法律问题您能给我讲讲吗？",
+  "老师，我想离职了。",
+  "老师，我准备去劳动局投诉。",
+];
+</script>
+
+<script>
+/* ============================================================
+   律所实习生存模拟器 · HJC の噩梦 v2.0 —— 逻辑层
+   ============================================================ */
+
 const $ = (id) => document.getElementById(id);
-const screenStart = $("screen-start");
-const screenGame = $("screen-game");
-const screenEnd = $("screen-end");
-const sceneBox = $("scene");
 
-// ---------- 工具 ----------
-function moodBySanity(s){
-  if(s >= 85) return "斗志昂扬";
-  if(s >= 65) return "略感疲惫";
-  if(s >= 45) return "开始破防";
-  if(s >= 25) return "濒临崩溃";
-  if(s > 0)  return "行尸走肉";
-  return "已 emo";
-}
-function sanityColor(s){
-  if(s >= 60) return "var(--olive)";
-  if(s >= 30) return "var(--ochre)";
-  return "var(--blood)";
+/* ---------- 全局状态 ---------- */
+const state = {
+  identity: "fresh",
+  difficulty: "normal",
+  day: 1,
+  sanity: 100,
+  sanityCap: 100,
+  money: 0,
+  lost: 0,
+  peers: 7,
+  sceneIndex: 0,
+  bag: {},            // 本局收集的道具 { id: true }
+  eventPoolSeen: {},  // 本局已触发的事件
+  tagCounts: {        // 用于成就检测
+    confront: 0, obey: 0, slack: 0, bargain: 0, night: 0, cCount: 0, allC: true,
+    consecutiveObey: 0, consecutiveConfront: 0,
+  },
+  newAchievements: [],
+  runId: 0,
+};
+
+function screen(name){
+  ["screen-start","screen-game","screen-end","screen-chat","screen-gallery"].forEach(id => {
+    const el = $(id); if(!el) return;
+    if(id === name) el.classList.remove("hidden");
+    else el.classList.add("hidden");
+  });
+  window.scrollTo({top:0});
 }
 
-function updateHUD(){
-  $("stat-day").textContent = state.day;
-  $("stat-money").textContent = state.money;
-  $("stat-sanity").textContent = Math.max(0, state.sanity);
-  $("stat-mood").textContent = moodBySanity(state.sanity);
-  $("stat-peers").textContent = Math.max(0, state.peers);
-  const bar = $("bar-sanity");
-  bar.style.width = Math.max(0, state.sanity) + "%";
-  bar.style.background = sanityColor(state.sanity);
+/* ---------- Toast ---------- */
+function toast(msg, dur=1800){
+  const el = $("toast");
+  el.textContent = msg;
+  el.classList.remove("hidden");
+  el.classList.add("toast-in");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>{ el.classList.add("hidden"); el.classList.remove("toast-in"); }, dur);
 }
 
+/* ---------- 弹幕 ---------- */
 function flyDanmu(text){
   const el = document.createElement("div");
   el.className = "danmu";
@@ -491,43 +885,157 @@ function flyDanmu(text){
   setTimeout(() => el.remove(), 10000);
 }
 
-// ---------- 渲染场景 ----------
+/* ---------- HUD ---------- */
+function moodBySanity(s){
+  if(s >= 85) return "斗志昂扬";
+  if(s >= 65) return "略感疲惫";
+  if(s >= 45) return "开始破防";
+  if(s >= 25) return "濒临崩溃";
+  if(s > 0)  return "行尸走肉";
+  return "已 emo";
+}
+function sanityColor(s){
+  if(s >= 60) return "var(--olive)";
+  if(s >= 30) return "var(--ochre)";
+  return "var(--blood)";
+}
+function updateHUD(){
+  $("stat-day").textContent = state.day;
+  $("stat-money").textContent = state.money;
+  const s = Math.max(0, state.sanity);
+  $("stat-sanity").textContent = s;
+  $("stat-mood").textContent = moodBySanity(s);
+  $("stat-peers").textContent = Math.max(0, state.peers);
+  const bar = $("bar-sanity");
+  const pct = Math.max(0, Math.min(100, s * (100 / state.sanityCap)));
+  bar.style.width = pct + "%";
+  bar.style.background = sanityColor(s);
+  $("bagBadge").textContent = Object.keys(state.bag).length;
+  $("badge-diff").classList.toggle("hidden", state.difficulty !== "hard");
+}
+
+/* ---------- 道具 ---------- */
+function grantItem(itemId){
+  if(!ITEMS[itemId] || state.bag[itemId]) return;
+  state.bag[itemId] = true;
+  SAVE.items[itemId] = true;
+  saveSave(SAVE);
+  toast("🎒 获得：" + ITEMS[itemId].icon + " " + ITEMS[itemId].name);
+  _hit("item_get_" + itemId);
+  updateHUD();
+  renderBag();
+  // 收藏家成就
+  if(Object.keys(SAVE.items).length >= Object.keys(ITEMS).length){
+    unlockAchievement("collector");
+  }
+}
+function renderBag(){
+  const grid = $("bagGrid");
+  const ids = Object.keys(ITEMS);
+  grid.innerHTML = "";
+  ids.forEach(id => {
+    const it = ITEMS[id];
+    const have = !!state.bag[id];
+    const seen = !!SAVE.items[id];
+    const div = document.createElement("div");
+    div.className = "item-slot " + (have ? "have" : (seen ? "dim" : ""));
+    div.innerHTML =
+      '<div style="font-size:28px;line-height:1;margin-bottom:6px">' + (have ? it.icon : (seen ? it.icon : "❔")) + '</div>' +
+      '<div class="text-xs font-bold">' + (have ? it.name : (seen ? it.name : "未收集")) + '</div>' +
+      '<div class="text-[10px] text-[var(--ink)]/55 mt-1">' + (have ? it.desc : (seen ? "曾发现过" : "???")) + '</div>';
+    grid.appendChild(div);
+  });
+  $("bagCount").textContent = Object.keys(state.bag).length;
+}
+$("bagOpen").onclick = () => { renderBag(); $("bagDrawer").classList.add("open"); $("bagMask").classList.add("on"); };
+$("bagClose").onclick = () => { $("bagDrawer").classList.remove("open"); $("bagMask").classList.remove("on"); };
+$("bagMask").onclick = () => { $("bagDrawer").classList.remove("open"); $("bagMask").classList.remove("on"); };
+
+/* ---------- 成就 ---------- */
+function unlockAchievement(id){
+  if(!ACHIEVEMENTS[id] || SAVE.achievements[id]) return;
+  SAVE.achievements[id] = { firstAt: Date.now() };
+  saveSave(SAVE);
+  state.newAchievements.push(id);
+  const a = ACHIEVEMENTS[id];
+  toast("🎖️ 成就解锁：" + a.icon + " " + a.name);
+  _hit("achievement_unlock");
+  _hit("achv_" + id);
+  updateHomeStats();
+}
+function checkRuntimeAchievements(){
+  if(state.sanity <= 0) unlockAchievement("first_break");
+  if(state.peers <= 0) unlockAchievement("last_intern");
+  if(state.tagCounts.bargain >= 3) unlockAchievement("bargain_pro");
+  if(state.tagCounts.night >= 3) unlockAchievement("night_warrior");
+  if(Object.keys(state.bag).length >= Object.keys(ITEMS).length) unlockAchievement("evidence_king");
+  if(state.tagCounts.consecutiveObey >= 2) unlockAchievement("eq_match");
+  if(state.tagCounts.consecutiveConfront >= 3) unlockAchievement("reverse_pua");
+  if(SAVE.dailyDates && SAVE.dailyDates.length >= 3) unlockAchievement("daily_checker");
+}
+
+/* ---------- 精神值扣血（含身份加成） ---------- */
+function applySanityDelta(delta){
+  if(!delta) return;
+  const id = IDENTITIES[state.identity];
+  let d = delta;
+  if(delta < 0) d = Math.round(delta * (id.puaMultiplier || 1.0));
+  state.sanity = Math.min(state.sanityCap, state.sanity + d);
+}
+
+/* ---------- 场景渲染 ---------- */
+const sceneBox = () => $("scene");
+
 function renderScene(){
   const sc = SCENES[state.sceneIndex];
   state.day = sc.day;
   updateHUD();
 
-  sceneBox.innerHTML = `
-    <div class="paper rounded-2xl shadow-lg border border-[#d8cdb5] p-5 md:p-7 float-in">
-      <span class="inline-block text-[11px] font-black tracking-wider px-2.5 py-1 rounded-full bg-[var(--blood)]/10 text-[var(--blood)] mb-3">${sc.tag}</span>
-      <h2 class="serif font-black text-2xl md:text-3xl mb-3">${sc.title}</h2>
-      <p class="text-[15px] md:text-base leading-relaxed text-[var(--ink)]/85 mb-5">${sc.narrative}</p>
+  const hasHiddenBecome = sc.final && state.tagCounts.consecutiveObey >= 3;
 
-      <div class="flex items-end gap-3 mb-6">
-        <div class="shrink-0 w-12 h-12 rounded-full bg-[#2b2622] text-[var(--ochre)] grid place-items-center serif font-black text-lg shadow">H</div>
-        <div class="bubble rounded-2xl rounded-bl-sm px-4 py-3 text-[15px] leading-relaxed shadow-md pop">${sc.boss}</div>
-      </div>
+  const choicesHTML = sc.choices.map((ch, i) => {
+    if(ch.requireStreak === "obey3" && !hasHiddenBecome) return "";
+    return "";
+  }).join("");
 
-      <p class="text-xs text-[var(--ink)]/50 mb-2 font-bold">▼ 你的选择</p>
-      <div id="choices" class="space-y-3"></div>
-    </div>
-  `;
+  sceneBox().innerHTML =
+    '<div class="paper rounded-2xl shadow-lg border border-[#d8cdb5] p-5 md:p-7 float-in">' +
+      '<span class="inline-block text-[11px] font-black tracking-wider px-2.5 py-1 rounded-full bg-[var(--blood)]/10 text-[var(--blood)] mb-3">' + sc.tag + '</span>' +
+      '<h2 class="serif font-black text-2xl md:text-3xl mb-3">' + sc.title + '</h2>' +
+      '<p class="text-[15px] md:text-base leading-relaxed text-[var(--ink)]/85 mb-5">' + sc.narrative + '</p>' +
+      '<div class="flex items-end gap-3 mb-6">' +
+        '<div class="shrink-0 w-12 h-12 rounded-full bg-[#2b2622] text-[var(--ochre)] grid place-items-center serif font-black text-lg shadow">H</div>' +
+        '<div class="bubble rounded-2xl rounded-bl-sm px-4 py-3 text-[15px] leading-relaxed shadow-md pop">' + sc.boss + '</div>' +
+      '</div>' +
+      '<p class="text-xs text-[var(--ink)]/50 mb-2 font-bold">▼ 你的选择</p>' +
+      '<div id="choices" class="space-y-3"></div>' +
+    '</div>';
 
   const box = $("choices");
   sc.choices.forEach((ch, i) => {
+    if(ch.requireStreak === "obey3" && !hasHiddenBecome) return;
     const b = document.createElement("button");
     b.className = "choice w-full text-left bg-white/70 hover:bg-white border-2 border-[#e2d8c2] hover:border-[var(--blood)]/60 rounded-xl px-4 py-3 text-[15px] font-medium";
+    let disabled = false; let hint = "";
+    if(ch.requireItems){
+      const bagCount = Object.keys(state.bag).length;
+      if(bagCount < ch.requireItems){
+        disabled = true;
+        hint = '<span class="text-[11px] text-[var(--blood)]/70 block mt-1">证据不足（' + bagCount + "/" + ch.requireItems + "）</span>";
+      }
+    }
+    if(disabled) b.disabled = true;
     b.innerHTML = '<span class="text-[var(--blood)] font-black serif mr-2">' + String.fromCharCode(65+i) + '.</span>' + ch.text
+      + hint
       + '<span class="choice-stat block text-[11px] mt-1.5 text-[var(--ink)]/40 font-normal">👥 加载历史选择中…</span>';
-    b.onclick = () => pick(ch, i);
+    b.onclick = () => pick(ch, i, false);
     box.appendChild(b);
   });
   annotateChoicePercents(state.sceneIndex);
 }
 
-// ---------- 获取历史选择占比并注解到按钮上 ----------
 function annotateChoicePercents(sceneIdx){
-  const letters = ["A","B","C"];
+  const letters = ["A","B","C","D"];
   Promise.all(letters.map(L =>
     fetch(ABACUS_BASE + "/get/" + ABACUS_NS + "/choice_" + sceneIdx + "_" + L, {mode:"cors"})
       .then(r => r.ok ? r.json() : null).catch(()=>null)
@@ -550,21 +1058,36 @@ function annotateChoicePercents(sceneIdx){
   }).catch(()=>{});
 }
 
-// ---------- 处理选择 ----------
-function pick(ch, idx){
-  // 埋点：记录当前场景选择分布
+/* ---------- 处理主线选择 ---------- */
+function pick(ch, idx, fromEvent){
+  // 埋点
   try { _hit("choice_" + state.sceneIndex + "_" + String.fromCharCode(65 + (idx||0))); } catch(e){}
-  // 结算数值
-  state.sanity = Math.min(100, state.sanity + (ch.sanity || 0));
+
+  // 更新 tag 计数
+  const tags = ch.tags || [];
+  const isConfront = tags.includes("confront");
+  const isObey = tags.includes("obey");
+  const isSlack = tags.includes("slack");
+  if(isConfront) { state.tagCounts.confront++; state.tagCounts.consecutiveConfront++; state.tagCounts.consecutiveObey = 0; }
+  else { state.tagCounts.consecutiveConfront = 0; }
+  if(isObey) { state.tagCounts.obey++; state.tagCounts.consecutiveObey++; }
+  else if(!fromEvent) { state.tagCounts.consecutiveObey = state.tagCounts.consecutiveObey > 0 && isSlack ? state.tagCounts.consecutiveObey : (isConfront?0:state.tagCounts.consecutiveObey); }
+  if(isSlack) state.tagCounts.slack++;
+  if(tags.includes("bargain")) state.tagCounts.bargain++;
+  if(idx !== 2) state.tagCounts.allC = false;
+
+  // 数值结算
+  applySanityDelta(ch.sanity || 0);
   state.money += (ch.money || 0);
   state.lost += (ch.lost || 0);
   if(ch.peers) state.peers = Math.max(0, state.peers + ch.peers);
-  updateHUD();
+  if(ch.item) grantItem(ch.item);
 
-  // 反馈
-  const card = sceneBox.querySelector(".paper");
-  card.classList.add("shake");
-  setTimeout(()=>card.classList.remove("shake"), 500);
+  updateHUD();
+  checkRuntimeAchievements();
+
+  const card = sceneBox().querySelector(".paper");
+  if(card){ card.classList.add("shake"); setTimeout(()=>card.classList.remove("shake"), 500); }
 
   if(ch.pua){
     const q = PUA_QUOTES[Math.floor(Math.random()*PUA_QUOTES.length)];
@@ -576,91 +1099,193 @@ function pick(ch, idx){
   if(ch.money)  deltas.push('<span style="color:var(--ochre)">到手 +¥' + ch.money + '</span>');
   if(ch.lost)   deltas.push('<span style="color:var(--blood)">损失 +¥' + ch.lost + '</span>');
   if(ch.peers)  deltas.push('<span style="color:var(--steel)">同伴 ' + ch.peers + '</span>');
+  if(ch.item)   deltas.push('<span style="color:var(--olive)">证据 +1</span>');
 
   const box = $("choices");
-  box.innerHTML = `
-    <div class="rounded-xl bg-[#2b2622] text-[#f4efe4] p-4 float-in">
-      <p class="text-[15px] leading-relaxed mb-3">${ch.result}</p>
-      <p class="text-sm font-bold">${deltas.join(" &nbsp;·&nbsp; ") || "&nbsp;"}</p>
-    </div>
-  `;
+  if(!box) return;
+  box.innerHTML =
+    '<div class="rounded-xl bg-[#2b2622] text-[#f4efe4] p-4 float-in">' +
+      '<p class="text-[15px] leading-relaxed mb-3">' + ch.result + '</p>' +
+      '<p class="text-sm font-bold">' + (deltas.join(" &nbsp;·&nbsp; ") || "&nbsp;") + '</p>' +
+    '</div>';
+
+  const collapsed = state.sanity <= 0;
+  const isLast = ch.ending || state.sceneIndex >= SCENES.length - 1;
 
   const next = document.createElement("button");
-  const isLast = ch.ending || state.sceneIndex >= SCENES.length - 1;
   next.className = "btn w-full mt-4 bg-[var(--blood)] hover:bg-[var(--blood-deep)] text-white font-black py-3.5 rounded-xl serif tracking-wider";
-  next.textContent = isLast ? "查看离职结算 →" : "熬到下一天 →";
 
-  // 精神值归零 → 强制结算
-  const collapsed = state.sanity <= 0;
-  if(collapsed) next.textContent = "精神崩溃，被迫离场 →";
-
-  next.onclick = () => {
-    if(collapsed){ endGame("collapse"); return; }
-    if(ch.ending){ endGame(ch.ending); return; }
-    state.sceneIndex++;
-    if(state.sceneIndex >= SCENES.length){ endGame("survive"); return; }
-    window.scrollTo({top:0, behavior:"smooth"});
-    renderScene();
-  };
+  if(collapsed && !ch.ending){
+    next.textContent = "精神崩溃，被迫离场 →";
+    next.onclick = () => endGame("collapse");
+  } else if(ch.ending){
+    next.textContent = "查看离职结算 →";
+    next.onclick = () => {
+      // 隐藏结局判定
+      if(ch.ending === "justice" && Object.keys(state.bag).length >= 5) return endGame("bureau");
+      if(ch.ending === "escape" && state.tagCounts.consecutiveConfront >= 3) return endGame("reverse");
+      endGame(ch.ending);
+    };
+  } else {
+    next.textContent = fromEvent ? "回到主线 →" : "熬到下一天 →";
+    next.onclick = () => afterChoice(fromEvent);
+  }
   box.appendChild(next);
 }
 
-// ---------- 结算 ----------
+function afterChoice(fromEvent){
+  // 随机事件已经处理完毕，走主线下一关
+  if(fromEvent){
+    // 从事件返回主线 → 已经预扣了本关，继续渲染当前 sceneIndex
+    window.scrollTo({top:0, behavior:"smooth"});
+    return renderScene();
+  }
+
+  // Boss 战判定（卷王模式）
+  if(state.difficulty === "hard"){
+    const boss = BOSSES.find(b => b.after === state.day && !state.eventPoolSeen["boss_"+b.id]);
+    if(boss){
+      state.eventPoolSeen["boss_"+boss.id] = true;
+      return renderBoss(boss);
+    }
+  }
+
+  // 30% 概率随机事件
+  const roll = Math.random();
+  if(roll < 0.30 && state.sceneIndex < SCENES.length - 1){
+    const pool = EVENTS.filter(e => !state.eventPoolSeen[e.id]);
+    if(pool.length){
+      const ev = pool[Math.floor(Math.random()*pool.length)];
+      state.eventPoolSeen[ev.id] = true;
+      return renderEvent(ev);
+    }
+  }
+
+  // 正常前进
+  state.sceneIndex++;
+  if(state.sceneIndex >= SCENES.length) return endGame("survive");
+  window.scrollTo({top:0, behavior:"smooth"});
+  renderScene();
+}
+
+/* ---------- 渲染随机事件 ---------- */
+function renderEvent(ev){
+  _hit("event_random_" + ev.id);
+  if(ev.night) state.tagCounts.night++;
+  sceneBox().innerHTML =
+    '<div class="paper rounded-2xl shadow-lg border-2 border-[var(--ochre)] p-5 md:p-7 float-in">' +
+      '<span class="inline-block text-[11px] font-black tracking-wider px-2.5 py-1 rounded-full bg-[var(--ochre)]/20 text-[var(--ochre)] mb-3">🎲 随机事件 · ' + ev.tag + '</span>' +
+      '<h2 class="serif font-black text-2xl md:text-3xl mb-3">' + ev.title + '</h2>' +
+      '<div class="flex items-end gap-3 mb-6">' +
+        '<div class="shrink-0 w-12 h-12 rounded-full bg-[#2b2622] text-[var(--ochre)] grid place-items-center serif font-black text-lg shadow">H</div>' +
+        '<div class="bubble rounded-2xl rounded-bl-sm px-4 py-3 text-[15px] leading-relaxed shadow-md pop">' + ev.boss + '</div>' +
+      '</div>' +
+      '<p class="text-xs text-[var(--ink)]/50 mb-2 font-bold">▼ 你的选择</p>' +
+      '<div id="choices" class="space-y-3"></div>' +
+    '</div>';
+
+  const box = $("choices");
+  ev.choices.forEach((ch, i) => {
+    const b = document.createElement("button");
+    b.className = "choice w-full text-left bg-white/70 hover:bg-white border-2 border-[#e2d8c2] hover:border-[var(--blood)]/60 rounded-xl px-4 py-3 text-[15px] font-medium";
+    b.innerHTML = '<span class="text-[var(--ochre)] font-black serif mr-2">' + String.fromCharCode(65+i) + '.</span>' + ch.text;
+    b.onclick = () => {
+      _hit("event_choice_" + ev.id + "_" + String.fromCharCode(65+i));
+      pick(ch, i, true);
+    };
+    box.appendChild(b);
+  });
+}
+
+/* ---------- Boss 战（限时） ---------- */
+let bossTimer = null;
+function renderBoss(boss){
+  _hit("boss_" + boss.id);
+  let remain = BOSS_TIME_LIMIT;
+  sceneBox().innerHTML =
+    '<div class="paper rounded-2xl shadow-lg border-2 border-[var(--blood)] p-5 md:p-7 float-in">' +
+      '<div class="flex justify-between items-center mb-3">' +
+        '<span class="inline-block text-[11px] font-black tracking-wider px-2.5 py-1 rounded-full bg-[var(--blood)]/20 text-[var(--blood)]">🔥 BOSS 战 · ' + boss.tag + '</span>' +
+        '<div class="timer-ring w-14 h-14 grid place-items-center" id="bossRing" style="--pct:100"><div class="bg-[var(--paper)] w-11 h-11 rounded-full grid place-items-center font-black serif text-[var(--blood)]" id="bossTimer">' + remain + '</div></div>' +
+      '</div>' +
+      '<h2 class="serif font-black text-2xl md:text-3xl mb-3">' + boss.title + '</h2>' +
+      '<div class="flex items-end gap-3 mb-6">' +
+        '<div class="shrink-0 w-12 h-12 rounded-full bg-[#2b2622] text-[var(--blood)] grid place-items-center serif font-black text-lg shadow">H</div>' +
+        '<div class="bubble rounded-2xl rounded-bl-sm px-4 py-3 text-[15px] leading-relaxed shadow-md pop">' + boss.boss + '</div>' +
+      '</div>' +
+      '<div id="choices" class="space-y-3"></div>' +
+    '</div>';
+
+  const box = $("choices");
+  boss.choices.forEach((ch, i) => {
+    ch.result = ch.result || "选择已提交。";
+    const b = document.createElement("button");
+    b.className = "choice w-full text-left bg-white/70 hover:bg-white border-2 border-[#e2d8c2] hover:border-[var(--blood)]/60 rounded-xl px-4 py-3 text-[15px] font-medium";
+    b.innerHTML = '<span class="text-[var(--blood)] font-black serif mr-2">' + String.fromCharCode(65+i) + '.</span>' + ch.text;
+    b.onclick = () => {
+      clearInterval(bossTimer);
+      const chosen = Object.assign({ result:"20 秒内你做出了决断。" }, ch);
+      pick(chosen, i, true);
+    };
+    box.appendChild(b);
+  });
+
+  bossTimer = setInterval(() => {
+    remain--;
+    const t = $("bossTimer"); if(t) t.textContent = remain;
+    const r = $("bossRing"); if(r) r.style.setProperty("--pct", Math.max(0,remain)*100/BOSS_TIME_LIMIT);
+    if(remain <= 0){
+      clearInterval(bossTimer);
+      const to = boss.timeout || { sanity:-15 };
+      pick(Object.assign({ result:"你没能在 20 秒内做出选择，HJC 直接给你判了差评。" }, to), 0, true);
+    }
+  }, 1000);
+}
+
+/* ---------- 结算 ---------- */
+let RUN_START_AT = 0;
 function endGame(type){
+  clearInterval(bossTimer);
   const shouldGet = state.day * SHOULD_PER_DAY;
   const got = state.money;
-  const lost = shouldGet - got + state.lost; // 应得未得 + 额外损失
+  const lost = shouldGet - got + state.lost;
   const sanity = Math.max(0, state.sanity);
+  const itemsCount = Object.keys(state.bag).length;
 
-  // 埋点：结局分布 + 坚持天数分桶
   _hit("ending_" + type);
+  if(ENDINGS[type] && ENDINGS[type].hidden) _hit("ending_hidden_" + type);
   const dayBucket = state.day >= 9 ? "9plus" : ("d" + state.day);
   _hit("days_" + dayBucket);
 
-  const ENDINGS = {
-    collapse: {
-      title: "精神崩溃，中途离场",
-      sub: "你的精神值归零了。走出律所大门时，你连哭的力气都没有。",
-      verdict: "该实习生在高强度 PUA 环境下坚持了 " + state.day + " 天，虽未走完全程，但及时止损、保住了心理健康的底线，理性得分满分。",
-      achv: "🧠 及时止损 ·「留得青山在」",
-      stamp: "崩溃",
-    },
-    escape: {
-      title: "潇洒逃离，全身而退",
-      sub: "你头也不回地走了。这不是失败，这是清醒。",
-      verdict: "该实习生识人精准、决断果敢，在被彻底榨干之前果断离场。这段经历将成为你简历里最值得吹的「避坑能力」。",
-      achv: "🏃 极速逃脱 ·「阳光都变香了」",
-      stamp: "逃离",
-    },
-    stay: {
-      title: "天真留守，越陷越深",
-      sub: "你以为能改变他……结局你已经知道了。",
-      verdict: "该实习生善良且有理想，可惜好心遇上了老油条。请记住：你无法叫醒一个装睡的人，更无法感化一个装穷的老板。",
-      achv: "💔 感化失败 ·「下一个讨薪钉子户」",
-      stamp: "沦陷",
-    },
-    justice: {
-      title: "留证维权，江湖再见",
-      sub: "你不仅跑了，还顺手把证据递了上去。",
-      verdict: "该实习生兼具情商、证据意识与反击勇气，堪称「打工人复仇者联盟」典范。不签协议、不买工伤、克扣工资、拖欠报销——每一条都是把柄。",
-      achv: "⚖️ 正义使者 ·「留痕即是力量」",
-      stamp: "维权",
-    },
-    survive: {
-      title: "熬满全程，虽败犹荣",
-      sub: "八大名场面你全经历了，居然还活着。",
-      verdict: "该实习生以惊人的意志力熬完了全部关卡。这份抗压能力放在任何正常单位都是宝藏，可惜遇上了 HJC。",
-      achv: "🛡️ 钢铁之躯 ·「什么妖魔鬼怪都见过」",
-      stamp: "幸存",
-    },
-  };
+  // duration 分桶
+  const duration = (Date.now() - RUN_START_AT) / 1000; // seconds
+  let bucket = "0_3";
+  if(duration >= 900) bucket = "15plus";
+  else if(duration >= 480) bucket = "8_15";
+  else if(duration >= 300) bucket = "5_8";
+  else if(duration >= 180) bucket = "3_5";
+  _hit("duration_bucket_" + bucket);
+
+  // 存档：结局解锁
+  SAVE.endings[type] = { firstAt: SAVE.endings[type] ? SAVE.endings[type].firstAt : Date.now(), lastAt: Date.now() };
+  saveSave(SAVE);
+
+  // 尾局成就检测
+  if(sanity <= 20 && state.sceneIndex >= SCENES.length - 1 && type === "survive") unlockAchievement("full_stayer");
+  if(state.tagCounts.allC && state.sceneIndex >= 3) unlockAchievement("slacker");
+  if(state.sceneIndex >= SCENES.length - 1) unlockAchievement("all_scenes");
+  if(type === "escape" && state.day <= 3) unlockAchievement("fast_escape");
+  if(got <= shouldGet * 0.5) unlockAchievement("cheapskate");
+  if(got === 100 || got === 110 || got === 120) unlockAchievement("wage_100");
 
   const e = ENDINGS[type] || ENDINGS.survive;
+  const idn = IDENTITIES[state.identity];
   $("end-title").textContent = e.title;
   $("end-sub").textContent = e.sub;
-  $("end-verdict").textContent = e.verdict;
+  $("end-verdict").textContent = e.verdictFn({ ...state, itemsCount });
   $("end-achv").textContent = e.achv;
   $("end-stamp").textContent = e.stamp;
+  $("end-identity").textContent = idn.icon + " " + idn.name + " · " + (state.difficulty === "hard" ? "卷王模式" : "普通");
 
   $("end-days").textContent = state.day;
   $("end-should").textContent = shouldGet;
@@ -668,43 +1293,335 @@ function endGame(type){
   $("end-lost").textContent = Math.max(0, lost);
   $("end-sanity").textContent = sanity;
   $("end-sanity").style.color = sanityColor(sanity);
+  $("end-items").textContent = itemsCount + " / " + Object.keys(ITEMS).length;
 
-  screenGame.classList.add("hidden");
-  screenEnd.classList.remove("hidden");
-  window.scrollTo({top:0, behavior:"smooth"});
+  // 新解锁成就 UI
+  const box = $("end-newAchvList");
+  const wrap = $("end-newAchv");
+  if(state.newAchievements.length === 0){
+    wrap.classList.add("hidden");
+  } else {
+    wrap.classList.remove("hidden");
+    box.innerHTML = state.newAchievements.map(id => {
+      const a = ACHIEVEMENTS[id]; if(!a) return "";
+      return '<div class="achv-badge"><div style="font-size:22px">' + a.icon + '</div>' +
+             '<div><p class="font-bold text-sm">' + a.name + '</p><p class="text-[11px] text-[var(--ink)]/60">' + a.desc + '</p></div></div>';
+    }).join("");
+  }
 
-  // 分享按钮
-  $("btn-share").onclick = () => {
-    const txt = "我在《律所实习生存模拟器·HJC の噩梦》中坚持了 " + state.day + " 天，"
-      + "到手 ¥" + got + "（应得 ¥" + shouldGet + "），被薅走 ¥" + Math.max(0,lost) + "，"
-      + "最终精神值 " + sanity + "。成就：" + e.achv + "。你也来体验一下这家律所？";
-    if(navigator.clipboard){
-      navigator.clipboard.writeText(txt).then(function(){
-        $("share-tip").classList.remove("hidden");
-      }).catch(function(){
-        $("share-tip").textContent = "复制失败，长按选中手动复制吧";
-        $("share-tip").classList.remove("hidden");
-      });
-    } else {
-      $("share-tip").textContent = "长按选中手动复制吧";
-      $("share-tip").classList.remove("hidden");
+  screen("screen-end");
+  updateHomeStats();
+  drawShareCard(type, e, { shouldGet, got, lost, sanity, itemsCount });
+
+  // 按钮
+  $("btn-share").onclick = downloadShareCard;
+  $("btn-copy").onclick = () => copyShareText(type, e, { shouldGet, got, lost, sanity, itemsCount });
+  $("btn-chat").onclick = () => openChat();
+  if(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) $("shareHintMobile").classList.remove("hidden");
+}
+
+function copyShareText(type, e, m){
+  const txt = "我在《律所实习生存模拟器·HJC の噩梦》v2 中坚持了 " + state.day + " 天，"
+    + "到手 ¥" + m.got + "（应得 ¥" + m.shouldGet + "），被薅走 ¥" + Math.max(0,m.lost) + "，"
+    + "证据收集 " + m.itemsCount + "/6，最终精神值 " + m.sanity + "。"
+    + "结局：" + e.title + "。成就：" + e.achv + "。 → https://udgtsz.github.io/hjc-sim/";
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(txt).then(()=>{ $("share-tip").textContent = "文字战绩已复制，快甩给你朋友 👀"; $("share-tip").classList.remove("hidden"); })
+      .catch(()=>{ $("share-tip").textContent = "复制失败，长按选中手动复制吧"; $("share-tip").classList.remove("hidden"); });
+  } else {
+    $("share-tip").textContent = "长按选中手动复制吧";
+    $("share-tip").classList.remove("hidden");
+  }
+}
+
+/* ---------- Canvas 分享卡 ---------- */
+function drawShareCard(type, e, m){
+  const cv = $("shareCanvas");
+  const ctx = cv.getContext("2d");
+  const W = cv.width, H = cv.height;
+
+  // 背景
+  const grd = ctx.createLinearGradient(0,0,W,H);
+  grd.addColorStop(0, "#f4efe4"); grd.addColorStop(1, "#e0d3b7");
+  ctx.fillStyle = grd; ctx.fillRect(0,0,W,H);
+
+  // 顶部深色条
+  ctx.fillStyle = "#2b2622";
+  ctx.fillRect(0,0,W,220);
+  // 印章
+  ctx.save();
+  ctx.translate(W-180, 130);
+  ctx.rotate(-9 * Math.PI/180);
+  ctx.strokeStyle = e.color || "#a6231d"; ctx.lineWidth = 8;
+  ctx.strokeRect(-90,-40,180,80);
+  ctx.fillStyle = e.color || "#a6231d";
+  ctx.font = "900 56px 'Noto Serif SC', serif";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText(e.stamp, 0, 0);
+  ctx.restore();
+
+  // 顶部文字
+  ctx.fillStyle = "#c98a2b"; ctx.font = "700 30px 'Noto Sans SC'";
+  ctx.textAlign = "left";
+  ctx.fillText("HJC の噩梦 · FINAL", 60, 90);
+  ctx.fillStyle = "#f4efe4"; ctx.font = "900 62px 'Noto Serif SC', serif";
+  ctx.fillText(e.title, 60, 170);
+
+  // 数据方框
+  let y = 300;
+  const rows = [
+    ["身份", IDENTITIES[state.identity].icon + " " + IDENTITIES[state.identity].name + (state.difficulty === "hard" ? " · 卷王模式" : "")],
+    ["坚持天数", state.day + " 天"],
+    ["实际到手", "¥" + m.got + " / 应得 ¥" + m.shouldGet],
+    ["被薅 + 拖欠", "¥" + Math.max(0, m.lost)],
+    ["最终精神值", m.sanity + " / " + state.sanityCap],
+    ["证据收集", m.itemsCount + " / 6"],
+  ];
+  ctx.font = "500 34px 'Noto Sans SC'";
+  ctx.fillStyle = "#241f1a";
+  rows.forEach((r, i) => {
+    const yy = y + i*70;
+    ctx.fillStyle = "#241f1a"; ctx.globalAlpha = .65;
+    ctx.textAlign = "left"; ctx.fillText(r[0], 60, yy);
+    ctx.globalAlpha = 1; ctx.textAlign = "right";
+    ctx.fillStyle = i===2 ? "#c98a2b" : (i===3 ? "#a6231d" : "#241f1a");
+    ctx.font = "900 38px 'Noto Serif SC', serif";
+    ctx.fillText(r[1], W-60, yy);
+    ctx.font = "500 34px 'Noto Sans SC'";
+  });
+
+  // 语录框
+  const bq = 300 + rows.length*70 + 30;
+  ctx.fillStyle = "#2b2622";
+  ctx.fillRect(60, bq, W-120, 200);
+  ctx.fillStyle = "#c98a2b"; ctx.font = "700 26px 'Noto Sans SC'"; ctx.textAlign = "left";
+  ctx.fillText("HJC 律师如是说：", 90, bq + 50);
+  ctx.fillStyle = "#f4efe4"; ctx.font = "500 32px 'Noto Sans SC'";
+  const q = PUA_QUOTES[Math.floor(Math.random()*PUA_QUOTES.length)];
+  wrapText(ctx, "「" + q + "」", 90, bq + 105, W-180, 42);
+
+  // 成就
+  ctx.fillStyle = "#a6231d"; ctx.font = "900 36px 'Noto Serif SC', serif"; ctx.textAlign = "center";
+  ctx.fillText(e.achv, W/2, H-260);
+
+  // 底部
+  ctx.fillStyle = "#241f1a"; ctx.globalAlpha = .55;
+  ctx.font = "500 24px 'Noto Sans SC'"; ctx.textAlign = "center";
+  ctx.fillText("律所实习生存模拟器 · v2.0 · 仅供娱乐，人物均为虚构", W/2, H-160);
+  ctx.font = "700 34px 'Noto Sans SC'"; ctx.globalAlpha = .85; ctx.fillStyle = "#a6231d";
+  ctx.fillText("https://udgtsz.github.io/hjc-sim/", W/2, H-100);
+  ctx.globalAlpha = 1;
+}
+function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+  const chars = text.split("");
+  let line = "", lines = [];
+  for(let i=0;i<chars.length;i++){
+    const test = line + chars[i];
+    if(ctx.measureText(test).width > maxWidth){
+      lines.push(line); line = chars[i];
+    } else line = test;
+  }
+  lines.push(line);
+  lines.slice(0, 3).forEach((L, idx) => ctx.fillText(L, x, y + idx*lineHeight));
+}
+function downloadShareCard(){
+  const cv = $("shareCanvas");
+  try{
+    _hit("share_card_download");
+    const url = cv.toDataURL("image/png");
+    const a = document.createElement("a");
+    const endName = ($("end-stamp").textContent || "结局").trim();
+    a.download = "hjc-sim-" + endName + "-" + state.day + "天.png";
+    a.href = url;
+    document.body.appendChild(a); a.click(); a.remove();
+    toast("已下载 · 或右键 / 长按图片保存");
+  }catch(e){
+    toast("下载失败，请长按下方图片保存");
+  }
+}
+
+/* ---------- HJC 微信复盘 ---------- */
+function openChat(){
+  screen("screen-chat");
+  const log = $("chatLog");
+  log.innerHTML = "";
+  chatSend("hjc", "你走归走，别到处乱说。行业圈子这么小，说不定以后咱们还合作。");
+  renderChatOptions(0);
+}
+function chatSend(who, text){
+  const log = $("chatLog");
+  const row = document.createElement("div");
+  row.className = "flex items-end gap-2 " + (who === "me" ? "justify-end" : "");
+  if(who === "hjc"){
+    row.innerHTML = '<div class="wx-avatar bg-[var(--ochre)] text-[#2b2622] serif">H</div><div class="wx-bubble-left text-[14px]">' + escapeHtml(text) + '</div>';
+  } else {
+    row.innerHTML = '<div class="wx-bubble-right text-[14px]">' + escapeHtml(text) + '</div><div class="wx-avatar bg-[var(--olive)] text-white serif">我</div>';
+  }
+  log.appendChild(row);
+  log.scrollTop = log.scrollHeight;
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" })[c]); }
+function hjcReply(userText){
+  for(const r of CHAT_RULES){
+    if(r.keys.some(k => userText.includes(k))){
+      return r.replies[Math.floor(Math.random()*r.replies.length)];
     }
-  };
+  }
+  return CHAT_DEFAULT_REPLIES[Math.floor(Math.random()*CHAT_DEFAULT_REPLIES.length)];
+}
+let CHAT_ROUND = 0;
+function renderChatOptions(round){
+  CHAT_ROUND = round;
+  const box = $("chatInputs");
+  box.innerHTML = "";
+  if(round >= 5){
+    const done = document.createElement("button");
+    done.className = "btn w-full bg-[var(--ink)] text-white font-bold py-2.5 rounded-xl text-sm";
+    done.textContent = "结束对话，返回结算";
+    done.onclick = () => screen("screen-end");
+    box.appendChild(done);
+    _hit("chat_finish");
+    return;
+  }
+  // 3 个候选（打乱）
+  const pool = CHAT_USER_OPTIONS.slice().sort(()=>Math.random()-.5).slice(0,3);
+  pool.forEach(opt => {
+    const b = document.createElement("button");
+    b.className = "btn w-full bg-[var(--olive)]/90 hover:bg-[var(--olive)] text-white font-bold py-2 rounded-lg text-sm text-left px-3";
+    b.textContent = opt;
+    b.onclick = () => {
+      chatSend("me", opt);
+      setTimeout(()=>{ chatSend("hjc", hjcReply(opt)); renderChatOptions(round+1); }, 500 + Math.random()*400);
+    };
+    box.appendChild(b);
+  });
+}
+$("chatClose").onclick = () => screen("screen-end");
+
+/* ---------- 图鉴 ---------- */
+function openGallery(kind){
+  screen("screen-gallery");
+  const body = $("galleryBody");
+  const title = $("galleryTitle");
+  if(kind === "endings"){
+    title.textContent = "结局图鉴";
+    const ids = Object.keys(ENDINGS);
+    body.innerHTML = '<div class="grid grid-cols-1 gap-3">' + ids.map(id => {
+      const e = ENDINGS[id]; const got = !!SAVE.endings[id];
+      return '<div class="achv-badge' + (got?'':' lock') + '">' +
+        '<div style="font-size:28px">' + (got ? (e.hidden ? "🌌" : "🏁") : "❓") + '</div>' +
+        '<div><p class="font-black serif text-sm">' + (got ? e.title : (e.hidden ? "隐藏结局 · ???" : "未解锁 · ???")) + '</p>' +
+        '<p class="text-[11px] text-[var(--ink)]/60 mt-1">' + (got ? e.sub : "达成条件后揭晓") + '</p></div></div>';
+    }).join("") + "</div>";
+  } else if(kind === "achv"){
+    title.textContent = "成就图鉴";
+    const ids = Object.keys(ACHIEVEMENTS);
+    body.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 gap-3">' + ids.map(id => {
+      const a = ACHIEVEMENTS[id]; const got = !!SAVE.achievements[id];
+      return '<div class="achv-badge' + (got?'':' lock') + '">' +
+        '<div style="font-size:24px">' + (got ? a.icon : "❔") + '</div>' +
+        '<div><p class="font-bold text-sm">' + (got ? a.name : "???") + '</p>' +
+        '<p class="text-[11px] text-[var(--ink)]/60">' + a.desc + '</p></div></div>';
+    }).join("") + "</div>";
+  } else {
+    title.textContent = "证据图鉴";
+    const ids = Object.keys(ITEMS);
+    body.innerHTML = '<div class="grid grid-cols-2 md:grid-cols-3 gap-3">' + ids.map(id => {
+      const it = ITEMS[id]; const got = !!SAVE.items[id];
+      return '<div class="item-slot ' + (got?'have':'') + '">' +
+        '<div style="font-size:28px;line-height:1;margin-bottom:6px">' + (got ? it.icon : "❔") + '</div>' +
+        '<div class="text-xs font-bold">' + (got ? it.name : "???") + '</div>' +
+        '<div class="text-[10px] text-[var(--ink)]/55 mt-1">' + (got ? it.desc : "本地未收集") + '</div></div>';
+    }).join("") + "</div>";
+  }
+}
+$("btn-gallery-endings").onclick = () => openGallery("endings");
+$("btn-gallery-achv").onclick = () => openGallery("achv");
+$("btn-gallery-items").onclick = () => openGallery("items");
+$("galleryClose").onclick = () => screen("screen-start");
+$("galleryReset").onclick = () => {
+  if(!confirm("确定清空所有本地图鉴 / 成就 / 道具存档？")) return;
+  localStorage.removeItem(LS_KEY);
+  Object.keys(SAVE).forEach(k => delete SAVE[k]);
+  Object.assign(SAVE, { endings:{}, achievements:{}, items:{}, dailyDates:[] });
+  updateHomeStats();
+  toast("已清空。");
+  screen("screen-start");
+};
+
+/* ---------- 首页统计更新 ---------- */
+function updateHomeStats(){
+  $("stat-endings").textContent = Object.keys(SAVE.endings).length + "/" + Object.keys(ENDINGS).length;
+  $("stat-achv").textContent = Object.keys(SAVE.achievements).length + "/" + Object.keys(ACHIEVEMENTS).length;
+  $("stat-items").textContent = Object.keys(SAVE.items).length + "/" + Object.keys(ITEMS).length;
 }
 
-// ---------- 控制 ----------
+/* ---------- 身份/难度选择 UI ---------- */
+function renderIdentityGrid(){
+  const grid = $("identityGrid");
+  grid.innerHTML = "";
+  Object.values(IDENTITIES).forEach(id => {
+    const b = document.createElement("button");
+    b.className = "btn identity-btn border-2 rounded-xl px-3 py-3 text-left bg-white/70 border-[#e2d8c2]";
+    b.dataset.id = id.id;
+    b.innerHTML =
+      '<div class="flex items-center justify-between"><span class="text-2xl">' + id.icon + '</span>' +
+      '<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--blood)]/10 text-[var(--blood)] font-bold">' + id.tag + '</span></div>' +
+      '<p class="font-black serif mt-1">' + id.name + '</p>' +
+      '<p class="text-[11px] text-[var(--ink)]/60">' + id.desc + '</p>' +
+      '<p class="text-[10px] text-[var(--ochre)] mt-1">' + id.quirk + '</p>';
+    b.onclick = () => selectIdentity(id.id);
+    grid.appendChild(b);
+  });
+  selectIdentity(state.identity);
+  document.querySelectorAll(".diff-btn").forEach(btn => {
+    btn.onclick = () => {
+      state.difficulty = btn.dataset.diff;
+      document.querySelectorAll(".diff-btn").forEach(x => x.classList.remove("border-[var(--blood)]","bg-[var(--blood)]/10"));
+      btn.classList.add("border-[var(--blood)]","bg-[var(--blood)]/10");
+    };
+  });
+  document.querySelector('[data-diff="normal"]').classList.add("border-[var(--blood)]","bg-[var(--blood)]/10");
+}
+function selectIdentity(id){
+  state.identity = id;
+  document.querySelectorAll(".identity-btn").forEach(b => {
+    if(b.dataset.id === id) b.classList.add("border-[var(--blood)]","bg-[var(--blood)]/10");
+    else b.classList.remove("border-[var(--blood)]","bg-[var(--blood)]/10");
+  });
+}
+
+/* ---------- 开始游戏 ---------- */
 function startGame(){
-  state.day = 1; state.sanity = 100; state.money = 0; state.lost = 0; state.peers = 7; state.sceneIndex = 0;
-  _hit("game_start");
-  screenStart.classList.add("hidden");
-  screenEnd.classList.add("hidden");
-  screenGame.classList.remove("hidden");
-  renderScene();
-  window.scrollTo({top:0});
-}
+  const idn = IDENTITIES[state.identity];
+  state.day = 1;
+  state.sanityCap = idn.sanityCap || 100;
+  state.sanity = idn.initSanity;
+  state.money = idn.initMoney;
+  state.lost = 0;
+  state.peers = 7;
+  state.sceneIndex = 0;
+  state.bag = {};
+  state.eventPoolSeen = {};
+  state.tagCounts = { confront:0, obey:0, slack:0, bargain:0, night:0, cCount:0, allC:true, consecutiveObey:0, consecutiveConfront:0 };
+  state.newAchievements = [];
+  state.runId++;
+  RUN_START_AT = Date.now();
 
+  _hit("game_start");
+  _hit("identity_" + state.identity);
+  _hit("difficulty_" + state.difficulty);
+
+  screen("screen-game");
+  renderScene();
+}
 $("btn-start").onclick = startGame;
-$("btn-restart").onclick = function(){ screenEnd.classList.add("hidden"); startGame(); };
+$("btn-restart").onclick = () => { screen("screen-start"); };
+
+/* ---------- 初始化 ---------- */
+renderIdentityGrid();
+updateHomeStats();
+renderBag();
 
 </script>
 </body>
