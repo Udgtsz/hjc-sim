@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<meta name="description" content="律所实习生存模拟器 · HJC の噩梦 —— 一款黑色幽默的实习劝退互动小游戏" />
+<meta property="og:title" content="律所实习生存模拟器 · HJC の噩梦" />
+<meta property="og:description" content="八大名场面、五种结局，看你能撑几天。" />
 <title>律所实习生存模拟器 · HJC の噩梦</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -127,7 +133,12 @@
         </div>
       </div>
 
-      <button id="btn-start" class="btn glow w-full mt-7 bg-[var(--blood)] hover:bg-[var(--blood-deep)] text-white font-black text-lg py-4 rounded-xl shadow-lg serif tracking-wider">
+      <div id="visitor-counter" class="mt-6 flex items-center justify-center gap-2 text-sm font-bold text-[var(--blood)]/80">
+        <span class="material-symbols-outlined text-base">groups</span>
+        <span>已有 <span id="visitor-count" class="serif font-black text-[var(--blood)] text-base">…</span> 位实习生亲历过 HJC</span>
+      </div>
+
+      <button id="btn-start" class="btn glow w-full mt-4 bg-[var(--blood)] hover:bg-[var(--blood-deep)] text-white font-black text-lg py-4 rounded-xl shadow-lg serif tracking-wider">
         签下卖身契，开始实习 →
       </button>
       <p class="text-center text-[11px] text-[var(--ink)]/45 mt-3">* 提示：合同还没让你签呢，你就已经开始了。</p>
@@ -208,6 +219,47 @@
    律所实习生存模拟器 · HJC の噩梦
    纯前端剧情逻辑
    ========================================================= */
+
+// ---------- 埋点 & 计数（Abacus 免费公共计数服务，无需注册）----------
+const ABACUS_BASE = "https://abacus.jasoncameron.dev";
+const ABACUS_NS   = "hjc-sim-2026";
+function _hit(key){
+  try{
+    return fetch(ABACUS_BASE + "/hit/" + ABACUS_NS + "/" + encodeURIComponent(key), {mode:"cors"})
+      .then(r => r.ok ? r.json() : null)
+      .catch(()=>null);
+  }catch(e){ return Promise.resolve(null); }
+}
+function trackProfile(){
+  try{
+    // 设备
+    _hit(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "device_mobile" : "device_desktop");
+    // 语言 / 时区（大致地域画像）
+    const lang = (navigator.language || "unknown").toLowerCase().split("-")[0];
+    _hit("lang_" + lang);
+    const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown").replace(/[^\w]/g,"_");
+    _hit("tz_" + tz);
+    // 来源渠道（微信 / 飞书 / 直接 / 其他）
+    const ref = (document.referrer || "").toLowerCase();
+    let refType = "direct";
+    if(!ref) refType = "direct";
+    else if(ref.includes("weixin") || ref.includes("wechat") || ref.includes("qq.com")) refType = "wechat";
+    else if(ref.includes("feishu") || ref.includes("lark") || ref.includes("<company-lark-domain-3f9a4c1b>")) refType = "lark";
+    else if(ref.includes("douyin") || ref.includes("tiktok") || ref.includes("xiaohongshu") || ref.includes("bilibili")) refType = "social";
+    else refType = "other";
+    _hit("refer_" + refType);
+  }catch(e){}
+}
+// PV：页面加载即上报，返回总人数用于渲染计数器
+_hit("page_view").then(res => {
+  const v = res && (res.value ?? res.count);
+  const el = document.getElementById("visitor-count");
+  if(el){
+    if(typeof v === "number") el.textContent = v.toLocaleString();
+    else el.textContent = "??";
+  }
+});
+trackProfile();
 
 // ---------- 全局状态 ----------
 const state = {
@@ -531,6 +583,11 @@ function endGame(type){
   const lost = shouldGet - got + state.lost; // 应得未得 + 额外损失
   const sanity = Math.max(0, state.sanity);
 
+  // 埋点：结局分布 + 坚持天数分桶
+  _hit("ending_" + type);
+  const dayBucket = state.day >= 9 ? "9plus" : ("d" + state.day);
+  _hit("days_" + dayBucket);
+
   const ENDINGS = {
     collapse: {
       title: "精神崩溃，中途离场",
@@ -609,6 +666,7 @@ function endGame(type){
 // ---------- 控制 ----------
 function startGame(){
   state.day = 1; state.sanity = 100; state.money = 0; state.lost = 0; state.peers = 7; state.sceneIndex = 0;
+  _hit("game_start");
   screenStart.classList.add("hidden");
   screenEnd.classList.add("hidden");
   screenGame.classList.remove("hidden");
