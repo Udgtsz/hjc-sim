@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>律所实习生存模拟器 · HJC の噩梦</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+<style>
+  :root{
+    --paper:#f4efe4;
+    --ink:#241f1a;
+    --blood:#a6231d;
+    --blood-deep:#7c1611;
+    --ochre:#c98a2b;
+    --olive:#5f6b3c;
+    --steel:#3c4a5a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Noto Sans SC',system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 20% 10%, rgba(201,138,43,.10), transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(166,35,29,.10), transparent 45%),
+      #ece5d6;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  .serif{font-family:'Noto Serif SC',serif}
+  /* paper texture */
+  .paper{
+    background:
+      linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,.5)),
+      repeating-linear-gradient(0deg, rgba(0,0,0,.015) 0 2px, transparent 2px 4px);
+    background-color:var(--paper);
+  }
+  .stamp{
+    border:3px solid var(--blood);
+    color:var(--blood);
+    transform:rotate(-9deg);
+    border-radius:8px;
+    letter-spacing:.15em;
+    box-shadow:inset 0 0 0 2px rgba(166,35,29,.25);
+    opacity:.9;
+  }
+  .btn{
+    transition:transform .15s ease, box-shadow .15s ease, background .2s;
+    will-change:transform;
+  }
+  .btn:hover{transform:translateY(-2px)}
+  .btn:active{transform:translateY(1px) scale(.99)}
+  .choice{
+    transition:transform .15s ease, box-shadow .2s, border-color .2s, background .2s;
+  }
+  .choice:hover{transform:translateX(6px); box-shadow:-6px 6px 0 rgba(36,31,26,.12)}
+  .bar-fill{transition:width .6s cubic-bezier(.22,1,.36,1), background .4s}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(4px)}}
+  .shake{animation:shake .5s}
+  @keyframes floatIn{from{opacity:0;transform:translateY(24px) scale(.98)}to{opacity:1;transform:none}}
+  .float-in{animation:floatIn .5s cubic-bezier(.22,1,.36,1) both}
+  @keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+  .pop{animation:pop .45s cubic-bezier(.22,1,.36,1) both}
+  @keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(166,35,29,.4)}50%{box-shadow:0 0 0 12px rgba(166,35,29,0)}}
+  .glow{animation:pulseGlow 2s infinite}
+  /* boss speech bubble */
+  .bubble{position:relative;background:#2b2622;color:#f4efe4}
+  .bubble:after{content:"";position:absolute;left:38px;bottom:-14px;border-width:14px 14px 0;border-style:solid;border-color:#2b2622 transparent transparent}
+  .danmu{position:fixed;white-space:nowrap;font-weight:700;pointer-events:none;z-index:60;text-shadow:0 1px 3px rgba(0,0,0,.35)}
+  @keyframes flyLeft{from{transform:translateX(100vw)}to{transform:translateX(-60vw)}}
+  .scanline{background:repeating-linear-gradient(0deg,rgba(0,0,0,.03) 0 1px,transparent 1px 3px)}
+  .hidden{display:none!important}
+  ::-webkit-scrollbar{width:10px}
+  ::-webkit-scrollbar-thumb{background:#c3b89f;border-radius:8px}
+  .kicker{letter-spacing:.35em}
+</style>
+</head>
+<body>
+<!-- 弹幕层 -->
+<div id="danmuLayer"></div>
+
+<div class="max-w-3xl mx-auto px-4 py-6 md:py-10">
+
+  <!-- ===================== 开始界面 ===================== -->
+  <section id="screen-start" class="float-in">
+    <div class="text-center mb-6">
+      <p class="kicker text-xs md:text-sm text-[var(--blood)] font-bold mb-3">B L A C K &nbsp; L A W &nbsp; F I R M &nbsp; S I M</p>
+      <h1 class="serif font-black leading-tight text-4xl md:text-6xl text-[var(--ink)]">
+        律所实习<br/><span class="text-[var(--blood)]">生存模拟器</span>
+      </h1>
+      <p class="serif text-lg md:text-xl mt-3 text-[var(--steel)]">—— HJC の噩梦 ——</p>
+    </div>
+
+    <div class="paper rounded-2xl shadow-xl border border-[#d8cdb5] p-6 md:p-8 relative overflow-hidden">
+      <div class="absolute -right-2 -top-2 stamp px-3 py-1 text-xs md:text-sm font-black serif">高危 · 慎入</div>
+      <p class="text-[15px] md:text-base leading-relaxed text-[var(--ink)]/90">
+        你是一名满怀憧憬的法学院实习生。今天，你入职了一家<strong class="text-[var(--blood)]">"传说中"</strong>的律所，
+        带教你的是——<strong class="serif">HJC 律师</strong>。
+      </p>
+      <p class="text-[15px] md:text-base leading-relaxed text-[var(--ink)]/90 mt-3">
+        接下来的日子里，你将亲历他的<strong>八大名场面</strong>：无限工作量、听不懂人话、"来解决问题不是来学习"、
+        克扣日薪、拖欠报销、砍价修罗场……
+      </p>
+      <p class="text-[15px] md:text-base leading-relaxed mt-3 text-[var(--steel)]">
+        你的目标：在<strong>精神值</strong>归零之前，尽量多熬几天、少被薅几块钱。<br/>
+        <span class="text-sm text-[var(--ink)]/60">（这是一款黑色幽默劝退模拟器，纯属娱乐 😌）</span>
+      </p>
+
+      <div class="grid grid-cols-3 gap-3 mt-6 text-center">
+        <div class="rounded-xl bg-white/60 border border-[#e2d8c2] p-3">
+          <span class="material-symbols-outlined text-[var(--olive)]">psychology</span>
+          <p class="text-xs mt-1 font-bold">精神值</p>
+          <p class="text-[11px] text-[var(--ink)]/60">被 PUA 就会掉</p>
+        </div>
+        <div class="rounded-xl bg-white/60 border border-[#e2d8c2] p-3">
+          <span class="material-symbols-outlined text-[var(--ochre)]">payments</span>
+          <p class="text-xs mt-1 font-bold">钱包</p>
+          <p class="text-[11px] text-[var(--ink)]/60">永远追不上应得</p>
+        </div>
+        <div class="rounded-xl bg-white/60 border border-[#e2d8c2] p-3">
+          <span class="material-symbols-outlined text-[var(--steel)]">event</span>
+          <p class="text-xs mt-1 font-bold">天数</p>
+          <p class="text-[11px] text-[var(--ink)]/60">熬得越久越猛</p>
+        </div>
+      </div>
+
+      <button id="btn-start" class="btn glow w-full mt-7 bg-[var(--blood)] hover:bg-[var(--blood-deep)] text-white font-black text-lg py-4 rounded-xl shadow-lg serif tracking-wider">
+        签下卖身契，开始实习 →
+      </button>
+      <p class="text-center text-[11px] text-[var(--ink)]/45 mt-3">* 提示：合同还没让你签呢，你就已经开始了。</p>
+    </div>
+  </section>
+
+  <!-- ===================== 游戏界面 ===================== -->
+  <section id="screen-game" class="hidden">
+    <!-- 状态栏 -->
+    <div class="paper sticky top-2 z-40 rounded-2xl shadow-lg border border-[#d8cdb5] p-4 mb-5">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-[var(--steel)]">event</span>
+          <span class="font-black serif text-lg">第 <span id="stat-day">1</span> 天</span>
+        </div>
+        <div class="text-right">
+          <span class="text-xs text-[var(--ink)]/60">累计到手</span>
+          <span class="font-black serif text-lg text-[var(--ochre)]"> ¥<span id="stat-money">0</span></span>
+        </div>
+      </div>
+      <!-- sanity bar -->
+      <div class="flex items-center gap-2 mb-2">
+        <span class="material-symbols-outlined text-[var(--olive)] text-lg">psychology</span>
+        <div class="flex-1 h-4 rounded-full bg-[#e6ddc9] overflow-hidden border border-[#d8cdb5]">
+          <div id="bar-sanity" class="bar-fill h-full bg-[var(--olive)] rounded-full" style="width:100%"></div>
+        </div>
+        <span class="text-sm font-bold w-10 text-right" id="stat-sanity">100</span>
+      </div>
+      <div class="flex justify-between text-[11px] text-[var(--ink)]/50 px-1">
+        <span>精神状态：<span id="stat-mood">斗志昂扬</span></span>
+        <span>组内实习生：<span id="stat-peers">7</span> 人</span>
+      </div>
+    </div>
+
+    <!-- 场景卡片 -->
+    <div id="scene" class="space-y-4"></div>
+  </section>
+
+  <!-- ===================== 结算界面 ===================== -->
+  <section id="screen-end" class="hidden float-in">
+    <div class="paper rounded-2xl shadow-2xl border border-[#d8cdb5] p-6 md:p-8 relative overflow-hidden scanline">
+      <div class="absolute -right-3 top-4 stamp px-4 py-1 text-sm font-black serif" id="end-stamp">离职</div>
+      <p class="kicker text-xs text-[var(--blood)] font-bold mb-2">FINAL SETTLEMENT · 离职结算单</p>
+      <h2 class="serif font-black text-3xl md:text-4xl mb-1" id="end-title">你逃离了这家律所</h2>
+      <p class="text-[var(--steel)] mb-5" id="end-sub"></p>
+
+      <div class="rounded-xl bg-white/70 border border-[#e2d8c2] divide-y divide-[#eadfc8] mb-5">
+        <div class="flex justify-between px-4 py-3"><span class="text-[var(--ink)]/70">坚持天数</span><span class="font-black serif"><span id="end-days">0</span> 天</span></div>
+        <div class="flex justify-between px-4 py-3"><span class="text-[var(--ink)]/70">应得工资（150/天）</span><span class="font-bold serif text-[var(--olive)]">¥<span id="end-should">0</span></span></div>
+        <div class="flex justify-between px-4 py-3"><span class="text-[var(--ink)]/70">实际到手</span><span class="font-bold serif text-[var(--steel)]">¥<span id="end-got">0</span></span></div>
+        <div class="flex justify-between px-4 py-3"><span class="text-[var(--ink)]/70">被 HJC 律师薅走 & 拖欠</span><span class="font-black serif text-[var(--blood)]">¥<span id="end-lost">0</span></span></div>
+        <div class="flex justify-between px-4 py-3"><span class="text-[var(--ink)]/70">最终精神值</span><span class="font-black serif" id="end-sanity">0</span></div>
+      </div>
+
+      <div class="rounded-xl bg-[#2b2622] text-[#f4efe4] p-4 mb-5">
+        <p class="text-xs text-[var(--ochre)] font-bold mb-1">📜 实习鉴定</p>
+        <p class="text-[15px] leading-relaxed" id="end-verdict"></p>
+      </div>
+
+      <div class="rounded-xl border-2 border-dashed border-[var(--blood)]/40 p-4 mb-6 bg-[var(--blood)]/5">
+        <p class="text-xs text-[var(--blood)] font-bold mb-1">🎖️ 解锁成就</p>
+        <p class="font-black serif text-lg" id="end-achv"></p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <button id="btn-restart" class="btn bg-[var(--ink)] hover:bg-black text-white font-bold py-3 rounded-xl">再受一次苦</button>
+        <button id="btn-share" class="btn bg-[var(--ochre)] hover:bg-[#b47a20] text-white font-bold py-3 rounded-xl">复制战绩转发</button>
+      </div>
+      <p id="share-tip" class="text-center text-xs text-[var(--olive)] mt-3 hidden">战绩已复制到剪贴板，快甩给你朋友 👀</p>
+    </div>
+    <p class="text-center text-[11px] text-[var(--ink)]/40 mt-4">本作纯属黑色幽默虚构演绎，如有雷同……那多半是真的。</p>
+  </section>
+
+</div>
+
+<script>
+/* =========================================================
+   律所实习生存模拟器 · HJC の噩梦
+   纯前端剧情逻辑
+   ========================================================= */
+
+// ---------- 全局状态 ----------
+const state = {
+  day: 1,
+  sanity: 100,
+  money: 0,        // 实际到手
+  lost: 0,         // 被克扣 + 拖欠 + 垫付未还
+  peers: 7,
+  sceneIndex: 0,
+};
+
+const SHOULD_PER_DAY = 150; // 律所规定最低日薪
+
+// ---------- HJC 语录（随机弹幕 + 反馈）----------
+const PUA_QUOTES = [
+  "请你来是解决问题的，不是来学习的。",
+  "这点活都嫌多？我当年通宵三天没喊过累。",
+  "别整天想着钱，格局要大一点。",
+  "这么简单的事你都要问我？",
+  "效率太低了，隔壁小王一天能立十个。",
+  "签什么协议，咱们都是自己人。",
+  "报销的事你先垫着，回头一起给你。",
+  "砍价失败？那是你不会来事儿。",
+  "年轻人吃点亏是福。",
+  "你这情商，以后怎么当律师。",
+];
+
+// ---------- 剧情关卡（八大名场面）----------
+const SCENES = [
+  // 事迹5 —— 入职：不签协议、不买工伤险
+  {
+    day: 1,
+    tag: "契约意识 · Ⅰ",
+    title: "入职第一天：消失的合同",
+    narrative: "所里规定，实习第一天必须签好实习协议、买好工伤保险。你满怀期待地问HJC 律师要合同。",
+    boss: "协议？保险？咱们都是自己人，先干活嘛，这些后面再补，误不了你的。",
+    choices: [
+      { text: "坚持：所里要求今天必须签，麻烦您走个流程。", sanity:-12, money:0, lost:0,
+        result: "他脸一沉，嘴里念叨「刚来就讲条件，格局小了」。合同？没有下文。", pua:true, peers:0 },
+      { text: "算了，先干活吧，别得罪带教。", sanity:-6, money:0, lost:0,
+        result: "你放弃了签约。一颗名为「没保障」的雷，就此埋下。", pua:false, peers:0 },
+      { text: "偷偷把「未签协议」记进备忘录，留证据。", sanity:-2, money:0, lost:0,
+        result: "机智！你默默截图留痕。虽然改变不了现状，但至少心里有底。", pua:false, peers:0 },
+    ],
+  },
+
+  // 事迹1 —— 一天立8个案子还嫌你慢
+  {
+    day: 2,
+    tag: "无限工作量 · Ⅰ",
+    title: "立案狂潮",
+    narrative: "早上九点，HJC 律师甩给你八个案子的立案材料，要求今天全部搞定，附赠一句「抓紧」。",
+    boss: "今天这八个案子必须立完。别磨蹭，请你来是干活的。",
+    choices: [
+      { text: "硬着头皮全接了，中午饭都没吃。", sanity:-15, money:0, lost:0,
+        result: "你八点半才立完最后一个，累到眼前发黑。他瞥了一眼：「才立完？效率太低了。」", pua:true, peers:0 },
+      { text: "委婉提出：八个有点多，能不能分两天？", sanity:-10, money:0, lost:0,
+        result: "「两天？你当这是养老院呢？」你被当场上了一课。", pua:true, peers:0 },
+      { text: "拉上同组实习生一起分工干。", sanity:-6, money:0, lost:0, peers:-1,
+        result: "你们几个实习生互帮互助勉强扛住。但有个同伴当天就提了离职。", pua:false },
+    ],
+  },
+
+  // 事迹1 —— 替他和法院、当事人沟通
+  {
+    day: 3,
+    tag: "无限工作量 · Ⅱ",
+    title: "沟通替身",
+    narrative: "本该HJC 律师亲自对接的法院和当事人，全被丢给了你。当事人一个电话打来，情绪激动地要说法。",
+    boss: "这个当事人你去对接，法院那边也是你跑。我忙，没空。",
+    choices: [
+      { text: "冒充「HJC 律师助理」，硬着头皮安抚当事人。", sanity:-14, money:0, lost:0,
+        result: "当事人骂了你二十分钟，你还得赔笑。挂电话时手都在抖。", pua:false, peers:0 },
+      { text: "如实说「我只是实习生，做不了主」。", sanity:-8, money:0, lost:0,
+        result: "当事人更炸了，投诉到HJC 律师那。他反手怪你「不会说话」。", pua:true, peers:0 },
+      { text: "把当事人的诉求整理成文档甩回给他。", sanity:-4, money:0, lost:0,
+        result: "他扫了一眼：「这不还得我看？你整理它干嘛？」——但至少你没背锅。", pua:false, peers:0 },
+    ],
+  },
+
+  // 事迹3 —— 请教被怼
+  {
+    day: 4,
+    tag: "带教黑洞",
+    title: "请教被怼",
+    narrative: "遇到一个专业问题，你想不明白，鼓起勇气去请教带教老师HJC 律师。",
+    boss: "这个啊……（沉默三秒）你自己查嘛。请你来是解决问题的，不是来学习的。",
+    choices: [
+      { text: "追问：那这个思路对不对，您给把个关？", sanity:-13, money:0, lost:0,
+        result: "他不耐烦地摆手：「我哪知道，你别问我。」——原来他自己也不会。", pua:true, peers:0 },
+      { text: "默默去问同组实习生和度娘。", sanity:-3, money:0, lost:0,
+        result: "同伴比带教靠谱多了。你们互相成了彼此唯一的老师。", pua:false, peers:0 },
+      { text: "心态崩了，去茶水间站了五分钟。", sanity:-6, money:0, lost:0,
+        result: "你望着窗外，认真思考了一下人生和法考的意义。", pua:false, peers:0 },
+    ],
+  },
+
+  // 事迹2 —— 情商黑洞，听不懂人话
+  {
+    day: 5,
+    tag: "沟通结界",
+    title: "鸡同鸭讲",
+    narrative: "你把一份紧急情况汇报给HJC 律师，反复解释了三遍，他就是 get 不到重点，还顺着自己的理解一通输出。",
+    boss: "你到底想说啥？说重点！……哦你是这个意思？（其实完全理解反了）",
+    choices: [
+      { text: "换更简单的话再解释第四遍。", sanity:-11, money:0, lost:0,
+        result: "第四遍他终于懂了，然后怪你「怎么不早说清楚」。你的血压升到了顶点。", pua:true, peers:0 },
+      { text: "画个图 + 写成一二三条发给他。", sanity:-5, money:0, lost:0,
+        result: "图文并茂他总算懂了。你悟了：和他沟通得用「说明书」级别的降维。", pua:false, peers:0 },
+      { text: "算了，按自己的判断先处理。", sanity:-8, money:0, lost:0,
+        result: "你自作主张处理了，虽然处理对了，但他嫌你「擅自做主」。左右不是人。", pua:true, peers:0 },
+    ],
+  },
+
+  // 事迹4 —— 抠门，日薪100，抠中饭钱
+  {
+    day: 6,
+    tag: "抠门刺客",
+    title: "午饭刺客",
+    narrative: "发薪日到了。所里最低日薪是 150，你算了算，卡里到账竟然只有 100 出头。一问才知道——他把「请你吃的中饭」从你工资里抠了。",
+    boss: "中午那顿盒饭是我请的？那不得算你头上。100 已经不少了，隔壁所才 80。",
+    choices: [
+      { text: "据理力争：所里明明规定最低 150。", sanity:-12, money:100, lost:50,
+        result: "他打太极：「预算紧张，先这样，以后涨。」——你心知肚明，不会有以后。", pua:true, peers:0 },
+      { text: "忍了，默默把 100 收下。", sanity:-9, money:110, lost:40,
+        result: "你不想撕破脸。看着组里 7 个实习生，他一个月省下的钱够买台新车。", pua:false, peers:0 },
+      { text: "以后自己带饭，一分不让他抠。", sanity:-4, money:120, lost:30,
+        result: "自带便当反击成功！他还阴阳你「这么节俭，有前途」。", pua:true, peers:0 },
+    ],
+  },
+
+  // 事迹6 —— 砍价修罗场
+  {
+    day: 7,
+    tag: "销售修罗场",
+    title: "砍价修罗场",
+    narrative: "今天你不是实习生，是销售。HJC 律师让你去和外地律师砍「调档、出庭」的价，目标是远低于市场价。砍不下来他 PUA 你，砍下来他还要你继续砍。",
+    boss: "这个价太贵了，你去砍，砍到市场价一半。砍不下来就是你不会来事儿。",
+    choices: [
+      { text: "厚着脸皮开砍，磨了对方一下午。", sanity:-13, money:0, lost:0,
+        result: "你砍下来 30%。他：「还能再砍，你继续。」——砍价没有终点，只有更低。", pua:true, peers:0 },
+      { text: "砍不动，如实回复。", sanity:-15, money:0, lost:0,
+        result: "「连个价都砍不下来，你还能干啥？」你被 PUA 得怀疑人生。", pua:true, peers:0 },
+      { text: "私下跟外地律师道歉：我也是被逼的。", sanity:-5, money:0, lost:0,
+        result: "对方律师懂了，友情价成交。同行何苦为难同行，你俩加了微信。", pua:false, peers:0 },
+    ],
+  },
+
+  // 事迹5 —— 报销罗生门 + 拖欠
+  {
+    day: 8,
+    tag: "契约意识 · Ⅱ",
+    title: "报销罗生门",
+    narrative: "这些天你自掏腰包垫付了打车、打印、调档一堆费用。你拿着单据去找HJC 律师报销，结果……",
+    boss: "报销啊？你先放这，我看看。（一周后）啥单据？我没收到啊。上个月工资？财务在弄了。",
+    choices: [
+      { text: "天天追着要，把他堵在工位。", sanity:-14, money:0, lost:300,
+        result: "追了半个月，报销款和拖欠工资依旧遥遥无期。你成了办公室「讨薪钉子户」。", pua:true, peers:0 },
+      { text: "把聊天记录、单据整理归档，准备维权。", sanity:-4, money:0, lost:300,
+        result: "你留好了全部证据链。虽然钱还没到，但你已经想好去哪儿投诉了。", pua:false, peers:0 },
+      { text: "认栽，就当花钱买了个教训。", sanity:-10, money:0, lost:350,
+        result: "你决定不要了。这几百块，成了你人生第一堂「识人」学费。", pua:false, peers:0 },
+    ],
+  },
+
+  // 终局抉择
+  {
+    day: 9,
+    tag: "命运的十字路口",
+    title: "去，还是留？",
+    narrative: "一周多下来，你身心俱疲。组里的实习生走了一个又一个。此刻，HJC 律师又拍了拍你的肩膀。",
+    boss: "小伙子不错，有潜力。留下来跟着我好好干，前途无量。",
+    final: true,
+    choices: [
+      { text: "潇洒递交离职，头也不回。", sanity:10, money:0, lost:0, ending:"escape",
+        result: "你笑着把工牌拍在桌上：告辞。走出律所那一刻，阳光都变香了。" },
+      { text: "留下来，试图「改变」这一切。", sanity:-20, money:0, lost:0, ending:"stay",
+        result: "你天真地以为能感化他……三个月后，你成了下一个「讨薪钉子户」。" },
+      { text: "留证据 + 离职 + 一纸投诉信寄给律所和劳动局。", sanity:18, money:0, lost:0, ending:"justice",
+        result: "你不仅全身而退，还把这些天攒下的证据递了上去。江湖再见，HJC 律师。" },
+    ],
+  },
+];
+
+// ---------- DOM ----------
+const $ = (id) => document.getElementById(id);
+const screenStart = $("screen-start");
+const screenGame = $("screen-game");
+const screenEnd = $("screen-end");
+const sceneBox = $("scene");
+
+// ---------- 工具 ----------
+function moodBySanity(s){
+  if(s >= 85) return "斗志昂扬";
+  if(s >= 65) return "略感疲惫";
+  if(s >= 45) return "开始破防";
+  if(s >= 25) return "濒临崩溃";
+  if(s > 0)  return "行尸走肉";
+  return "已 emo";
+}
+function sanityColor(s){
+  if(s >= 60) return "var(--olive)";
+  if(s >= 30) return "var(--ochre)";
+  return "var(--blood)";
+}
+
+function updateHUD(){
+  $("stat-day").textContent = state.day;
+  $("stat-money").textContent = state.money;
+  $("stat-sanity").textContent = Math.max(0, state.sanity);
+  $("stat-mood").textContent = moodBySanity(state.sanity);
+  $("stat-peers").textContent = Math.max(0, state.peers);
+  const bar = $("bar-sanity");
+  bar.style.width = Math.max(0, state.sanity) + "%";
+  bar.style.background = sanityColor(state.sanity);
+}
+
+function flyDanmu(text){
+  const el = document.createElement("div");
+  el.className = "danmu";
+  el.textContent = "「" + text + "」";
+  const top = 80 + Math.random() * (window.innerHeight - 200);
+  el.style.top = top + "px";
+  el.style.left = "0px";
+  el.style.color = Math.random() > .5 ? "var(--blood)" : "var(--steel)";
+  el.style.fontSize = (16 + Math.random()*8) + "px";
+  el.style.animation = "flyLeft " + (7 + Math.random()*3) + "s linear forwards";
+  $("danmuLayer").appendChild(el);
+  setTimeout(() => el.remove(), 10000);
+}
+
+// ---------- 渲染场景 ----------
+function renderScene(){
+  const sc = SCENES[state.sceneIndex];
+  state.day = sc.day;
+  updateHUD();
+
+  sceneBox.innerHTML = `
+    <div class="paper rounded-2xl shadow-lg border border-[#d8cdb5] p-5 md:p-7 float-in">
+      <span class="inline-block text-[11px] font-black tracking-wider px-2.5 py-1 rounded-full bg-[var(--blood)]/10 text-[var(--blood)] mb-3">${sc.tag}</span>
+      <h2 class="serif font-black text-2xl md:text-3xl mb-3">${sc.title}</h2>
+      <p class="text-[15px] md:text-base leading-relaxed text-[var(--ink)]/85 mb-5">${sc.narrative}</p>
+
+      <div class="flex items-end gap-3 mb-6">
+        <div class="shrink-0 w-12 h-12 rounded-full bg-[#2b2622] text-[var(--ochre)] grid place-items-center serif font-black text-lg shadow">H</div>
+        <div class="bubble rounded-2xl rounded-bl-sm px-4 py-3 text-[15px] leading-relaxed shadow-md pop">${sc.boss}</div>
+      </div>
+
+      <p class="text-xs text-[var(--ink)]/50 mb-2 font-bold">▼ 你的选择</p>
+      <div id="choices" class="space-y-3"></div>
+    </div>
+  `;
+
+  const box = $("choices");
+  sc.choices.forEach((ch, i) => {
+    const b = document.createElement("button");
+    b.className = "choice w-full text-left bg-white/70 hover:bg-white border-2 border-[#e2d8c2] hover:border-[var(--blood)]/60 rounded-xl px-4 py-3 text-[15px] font-medium";
+    b.innerHTML = '<span class="text-[var(--blood)] font-black serif mr-2">' + String.fromCharCode(65+i) + '.</span>' + ch.text;
+    b.onclick = () => pick(ch);
+    box.appendChild(b);
+  });
+}
+
+// ---------- 处理选择 ----------
+function pick(ch){
+  // 结算数值
+  state.sanity = Math.min(100, state.sanity + (ch.sanity || 0));
+  state.money += (ch.money || 0);
+  state.lost += (ch.lost || 0);
+  if(ch.peers) state.peers = Math.max(0, state.peers + ch.peers);
+  updateHUD();
+
+  // 反馈
+  const card = sceneBox.querySelector(".paper");
+  card.classList.add("shake");
+  setTimeout(()=>card.classList.remove("shake"), 500);
+
+  if(ch.pua){
+    const q = PUA_QUOTES[Math.floor(Math.random()*PUA_QUOTES.length)];
+    flyDanmu(q);
+  }
+
+  const deltas = [];
+  if(ch.sanity) deltas.push('<span style="color:' + (ch.sanity<0?'var(--blood)':'var(--olive)') + '">精神 ' + (ch.sanity>0?'+':'') + ch.sanity + '</span>');
+  if(ch.money)  deltas.push('<span style="color:var(--ochre)">到手 +¥' + ch.money + '</span>');
+  if(ch.lost)   deltas.push('<span style="color:var(--blood)">损失 +¥' + ch.lost + '</span>');
+  if(ch.peers)  deltas.push('<span style="color:var(--steel)">同伴 ' + ch.peers + '</span>');
+
+  const box = $("choices");
+  box.innerHTML = `
+    <div class="rounded-xl bg-[#2b2622] text-[#f4efe4] p-4 float-in">
+      <p class="text-[15px] leading-relaxed mb-3">${ch.result}</p>
+      <p class="text-sm font-bold">${deltas.join(" &nbsp;·&nbsp; ") || "&nbsp;"}</p>
+    </div>
+  `;
+
+  const next = document.createElement("button");
+  const isLast = ch.ending || state.sceneIndex >= SCENES.length - 1;
+  next.className = "btn w-full mt-4 bg-[var(--blood)] hover:bg-[var(--blood-deep)] text-white font-black py-3.5 rounded-xl serif tracking-wider";
+  next.textContent = isLast ? "查看离职结算 →" : "熬到下一天 →";
+
+  // 精神值归零 → 强制结算
+  const collapsed = state.sanity <= 0;
+  if(collapsed) next.textContent = "精神崩溃，被迫离场 →";
+
+  next.onclick = () => {
+    if(collapsed){ endGame("collapse"); return; }
+    if(ch.ending){ endGame(ch.ending); return; }
+    state.sceneIndex++;
+    if(state.sceneIndex >= SCENES.length){ endGame("survive"); return; }
+    window.scrollTo({top:0, behavior:"smooth"});
+    renderScene();
+  };
+  box.appendChild(next);
+}
+
+// ---------- 结算 ----------
+function endGame(type){
+  const shouldGet = state.day * SHOULD_PER_DAY;
+  const got = state.money;
+  const lost = shouldGet - got + state.lost; // 应得未得 + 额外损失
+  const sanity = Math.max(0, state.sanity);
+
+  const ENDINGS = {
+    collapse: {
+      title: "精神崩溃，中途离场",
+      sub: "你的精神值归零了。走出律所大门时，你连哭的力气都没有。",
+      verdict: "该实习生在高强度 PUA 环境下坚持了 " + state.day + " 天，虽未走完全程，但及时止损、保住了心理健康的底线，理性得分满分。",
+      achv: "🧠 及时止损 ·「留得青山在」",
+      stamp: "崩溃",
+    },
+    escape: {
+      title: "潇洒逃离，全身而退",
+      sub: "你头也不回地走了。这不是失败，这是清醒。",
+      verdict: "该实习生识人精准、决断果敢，在被彻底榨干之前果断离场。这段经历将成为你简历里最值得吹的「避坑能力」。",
+      achv: "🏃 极速逃脱 ·「阳光都变香了」",
+      stamp: "逃离",
+    },
+    stay: {
+      title: "天真留守，越陷越深",
+      sub: "你以为能改变他……结局你已经知道了。",
+      verdict: "该实习生善良且有理想，可惜好心遇上了老油条。请记住：你无法叫醒一个装睡的人，更无法感化一个装穷的老板。",
+      achv: "💔 感化失败 ·「下一个讨薪钉子户」",
+      stamp: "沦陷",
+    },
+    justice: {
+      title: "留证维权，江湖再见",
+      sub: "你不仅跑了，还顺手把证据递了上去。",
+      verdict: "该实习生兼具情商、证据意识与反击勇气，堪称「打工人复仇者联盟」典范。不签协议、不买工伤、克扣工资、拖欠报销——每一条都是把柄。",
+      achv: "⚖️ 正义使者 ·「留痕即是力量」",
+      stamp: "维权",
+    },
+    survive: {
+      title: "熬满全程，虽败犹荣",
+      sub: "八大名场面你全经历了，居然还活着。",
+      verdict: "该实习生以惊人的意志力熬完了全部关卡。这份抗压能力放在任何正常单位都是宝藏，可惜遇上了 HJC。",
+      achv: "🛡️ 钢铁之躯 ·「什么妖魔鬼怪都见过」",
+      stamp: "幸存",
+    },
+  };
+
+  const e = ENDINGS[type] || ENDINGS.survive;
+  $("end-title").textContent = e.title;
+  $("end-sub").textContent = e.sub;
+  $("end-verdict").textContent = e.verdict;
+  $("end-achv").textContent = e.achv;
+  $("end-stamp").textContent = e.stamp;
+
+  $("end-days").textContent = state.day;
+  $("end-should").textContent = shouldGet;
+  $("end-got").textContent = got;
+  $("end-lost").textContent = Math.max(0, lost);
+  $("end-sanity").textContent = sanity;
+  $("end-sanity").style.color = sanityColor(sanity);
+
+  screenGame.classList.add("hidden");
+  screenEnd.classList.remove("hidden");
+  window.scrollTo({top:0, behavior:"smooth"});
+
+  // 分享按钮
+  $("btn-share").onclick = () => {
+    const txt = "我在《律所实习生存模拟器·HJC の噩梦》中坚持了 " + state.day + " 天，"
+      + "到手 ¥" + got + "（应得 ¥" + shouldGet + "），被薅走 ¥" + Math.max(0,lost) + "，"
+      + "最终精神值 " + sanity + "。成就：" + e.achv + "。你也来体验一下这家律所？";
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(txt).then(function(){
+        $("share-tip").classList.remove("hidden");
+      }).catch(function(){
+        $("share-tip").textContent = "复制失败，长按选中手动复制吧";
+        $("share-tip").classList.remove("hidden");
+      });
+    } else {
+      $("share-tip").textContent = "长按选中手动复制吧";
+      $("share-tip").classList.remove("hidden");
+    }
+  };
+}
+
+// ---------- 控制 ----------
+function startGame(){
+  state.day = 1; state.sanity = 100; state.money = 0; state.lost = 0; state.peers = 7; state.sceneIndex = 0;
+  screenStart.classList.add("hidden");
+  screenEnd.classList.add("hidden");
+  screenGame.classList.remove("hidden");
+  renderScene();
+  window.scrollTo({top:0});
+}
+
+$("btn-start").onclick = startGame;
+$("btn-restart").onclick = function(){ screenEnd.classList.add("hidden"); startGame(); };
+
+</script>
+</body>
+</html>
