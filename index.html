@@ -7,9 +7,9 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 <meta name="description" content="律所实习生存模拟器 · HJC の噩梦 v2 —— 黑色幽默的实习劝退互动小游戏" />
-<meta property="og:title" content="律所实习生存模拟器 · HJC の噩梦 v2" />
-<meta property="og:description" content="随机事件 · 证据收集 · 15 成就 · 8 结局 · 生成分享卡" />
-<title>律所实习生存模拟器 · HJC の噩梦 v2.0</title>
+<meta property="og:title" content="律所实习生存模拟器 · HJC の噩梦 v2.1" />
+<meta property="og:description" content="随机事件 · 证据收集 · 18 成就 · 10 结局 · 生成分享卡" />
+<title>律所实习生存模拟器 · HJC の噩梦 v2.1</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet" />
@@ -290,6 +290,7 @@
         <button id="btn-share" class="btn bg-[var(--ochre)] hover:bg-[#b47a20] text-white font-bold py-3 rounded-xl text-sm">📥 下载卡片</button>
       </div>
       <button id="btn-copy" class="btn w-full mt-3 bg-white/60 border border-[#e2d8c2] hover:border-[var(--blood)]/50 text-[var(--ink)] font-bold py-2.5 rounded-xl text-sm">📋 复制文字战绩</button>
+      <button id="btn-seed-link" class="btn w-full mt-2 bg-white/60 border border-[#e2d8c2] hover:border-[var(--blood)]/50 text-[var(--ink)] font-bold py-2.5 rounded-xl text-sm">🔗 复制结局链接（发给朋友看）</button>
       <p id="share-tip" class="text-center text-xs text-[var(--olive)] mt-3 hidden">已复制到剪贴板，快甩给你朋友 👀</p>
     </div>
     <p class="text-center text-[11px] text-[var(--ink)]/40 mt-4">本作纯属黑色幽默虚构演绎，人物均为虚构，如有雷同……那多半是真的。</p>
@@ -335,7 +336,7 @@
 
 <script>
 /* ============================================================
-   律所实习生存模拟器 · HJC の噩梦 v2.0
+   律所实习生存模拟器 · HJC の噩梦 v2.1
    单文件纯前端游戏 / 无后端 / GitHub Pages 部署
    ============================================================ */
 
@@ -487,6 +488,10 @@ const ACHIEVEMENTS = {
   full_stayer:   { id:"full_stayer",   name:"活死人",         icon:"💀", desc:"精神值 ≤ 20 时仍熬完全程" },
   reverse_pua:   { id:"reverse_pua",   name:"反向 PUA",       icon:"🔥", desc:"连续 3 次选择「直接怼回去」类选项" },
   collector:     { id:"collector",     name:"收藏家",         icon:"🗂️", desc:"累计发现全部 6 件证据道具（跨局）" },
+  // ===== v2.1 新增 3 成就 =====
+  rebel_leader:  { id:"rebel_leader",  name:"反抗军领袖",     icon:"✊", desc:"一局中触发「组内地震」和「老同学电话」两个新事件" },
+  internet_famous:{ id:"internet_famous", name:"社死名场面",  icon:"📱", desc:"触发「你被写进小红书」事件" },
+  survivor_marathon:{ id:"survivor_marathon", name:"打工鲁滨逊", icon:"🏝️", desc:"只用二本法学身份在卷王模式下坚持满 9 天" },
 };
 
 /* ---------- 剧情主线 SCENES（9 关） ---------- */
@@ -728,6 +733,87 @@ const EVENTS = [
         result:"你把电话甩过去了。HJC 事后说你「不会处理」。" },
     ],
   },
+  // ===== v2.1 新增 8 条随机事件 =====
+  { id:"moments_like", tag:"朋友圈点赞刺客 📣", night:true,
+    title:"深夜朋友圈被 @",
+    boss:"HJC 深夜发了条「再苦再累也要熬」，第二天群 @你：昨晚那条朋友圈你看到了吗？怎么没点赞？",
+    choices:[
+      { text:"赶紧去补点，再在评论区发「向老师学习」。", sanity:-8, tags:["obey"],
+        result:"你在评论区把自己的人设又杀死了一次。HJC 很满意。" },
+      { text:"装没看到，说昨晚睡得早。", sanity:-4, tags:["slack"],
+        result:"他意味深长地「嗯」了一声。你的朋友圈权限从此对他设置成了「仅聊天」。" },
+    ],
+  },
+  { id:"photoshop_plea", tag:"抠图求助 🧑‍🎨",
+    title:"HJC 让你 P 张照片",
+    boss:"你不是年轻人吗，帮我 P 张图——把我放到迪拜哈利法塔前面。P 好一点啊，我要发朋友圈。",
+    choices:[
+      { text:"硬着头皮用美图秀秀糊了一张。", sanity:-7, tags:["obey"],
+        result:"他看了一眼：「你这个抠图水平不行啊，边缘都糊了。重做。」你被迫重做了三次。" },
+      { text:"说不会 PS，推荐他去淘宝花 5 块钱找人 P。", sanity:-3, tags:["slack"],
+        result:"他脸色一沉：「这点小事都不愿意帮忙。」——但他没再找你 P 图了。" },
+    ],
+  },
+  { id:"old_classmate", tag:"老同学电话 ☎️",
+    title:"老同学打来电话",
+    boss:"（电话那头）喂？我入职 XX 大所了，日薪 400 还包午饭。你那边怎么样？",
+    choices:[
+      { text:"强颜欢笑：「挺好的，学到很多东西。」", sanity:-8, tags:["obey"],
+        result:"挂了电话，你看着自己卡里 100 块的日薪，沉默了很久。人生的参差，在这一刻被拉到最大。" },
+      { text:"如实吐槽：「带教是个 PUA 怪，我在考虑跑路。」", sanity:+3, tags:["confront"],
+        result:"老同学秒懂：「我们团队还缺人，你要不要简历发我？」——信息差被友情抹平了。" },
+    ],
+  },
+  { id:"parents_call", tag:"亲情压力 👪", night:true,
+    title:"爸妈打来电话",
+    boss:"（电话那头）实习难得，忍一忍。年轻人不要老想着换工作，稳定最重要。",
+    choices:[
+      { text:"忍着眼泪说「知道了」，挂了电话继续加班。", sanity:-12, tags:["obey"],
+        result:"家人的不理解比 PUA 更伤人。你对着电脑屏幕发了很久的呆，键盘上的字终于打不下去了。" },
+      { text:"把实情告诉他们：「带教不签合同、扣工资、还 PUA 我。」", sanity:+5, tags:["confront"],
+        result:"电话那头沉默了几秒：「……那你还留着干嘛？赶紧找下家啊。」——这次，爸妈站在了你这边。" },
+    ],
+  },
+  { id:"hr_talk", tag:"HR 谈心 🍬",
+    title:"HR 突然找你「聊聊」",
+    boss:"（HR 笑盈盈地）HJC 律师很看好你，跟我夸过你几次。来，写一份自评吧，对以后留用有帮助。",
+    choices:[
+      { text:"认认真真写了一份 800 字自评。", sanity:-5, item:"chat", tags:["obey"],
+        result:"你把自评交了上去。HR 说了句「辛苦了」就再没下文。后来你才知道——所谓的留用，从来没排上过日程。" },
+      { text:"警惕地问：「是不是每个人都要写？」", sanity:-2, tags:["confront"],
+        result:"HR 的笑容僵了半秒：「也不是……主要看表现。」你心里门清：这是在让你自我审查。" },
+    ],
+  },
+  { id:"cod_parcel", tag:"快递到付 📦",
+    title:"HJC 让你帮他签收快递",
+    boss:"（前台）HJC 律师的快递到了，45 块到付。他说让你先垫一下。",
+    choices:[
+      { text:"掏钱付了，把快递送到他桌上。", sanity:-6, lost:45, item:"bill", tags:["obey"],
+        result:"你垫了 45 块。报销？不存在的。那张快递单成了你证据包里又一张小票。" },
+      { text:"跟前台说「请让他自己来付」。", sanity:-4, tags:["confront"],
+        result:"前台一脸为难。HJC 后来沉着脸自己付了，但当天下午就给你多派了三个案子。「效率太低」是免不了的。" },
+    ],
+  },
+  { id:"peer_quit_drama", tag:"组内地震 💥",
+    title:"同伴在群里长文控诉后辞职",
+    boss:"（微信群）实习生小王发了一条 500 字长文，控诉 HJC 不签合同、克扣工资、PUA，然后秒退群。群内一片死寂。",
+    choices:[
+      { text:"截图存档，默默给小王发私信：「勇士，respect。」", sanity:+4, item:"chat", tags:["slack"],
+        result:"小王收到了十几条私信。三天后，所里被迫开了个「实习生权益座谈会」——虽然最后还是走了个过场。但小王的名字，在联盟群里封了神。" },
+      { text:"在群里跟了一条：「+1，我也被扣了。」", sanity:-6, peers:-2, tags:["confront"],
+        result:"你也被踢出了群。但你和小王的遭遇在联盟群里炸了——「HJC 受害者联盟」当晚多了 8 个新成员。" },
+    ],
+  },
+  { id:"xiaohongshu_exposed", tag:"网络传播 📱",
+    title:"你被写进了小红书",
+    boss:"（隔壁实习生递过来手机）你看这个帖子……说的是不是你？「某律所实习生 AA 制团建被克扣日薪……」",
+    choices:[
+      { text:"点进去看完，默默收藏，转发到联盟群。", sanity:+2, tags:["slack"],
+        result:"帖子已经两千多点赞了。评论区炸了——「是北外滩那个吧」「我朋友实习过，一模一样」「避雷帖+1」。你不是一个人。" },
+      { text:"在评论区匿名回复：「我是当事人，还有更离谱的。」", sanity:+6, tags:["confront"],
+        result:"你的评论被顶到热一。一觉醒来，帖子破万赞。HJC 律师还不知道——但整个北外滩的法学生都知道了。" },
+    ],
+  },
 ];
 
 /* ---------- Boss 战（卷王模式追加 3 关） ---------- */
@@ -789,6 +875,13 @@ const ENDINGS = {
   become:   { hidden:true,  title:"隐藏结局 · 你成了下一个 HJC", sub:"你熬完了。三年后，你也开始扣实习生的中饭钱。",
     verdictFn: s => "该实习生黑化上岸，掌握了「PUA · 抠门 · 拖欠 · 甩锅」四大心法。恭喜，你已经具备开一家 HJC 分号的能力。",
     achv:"👑 传承者 ·「原来这就是律师的赚钱之道」", stamp:"黑化", color:"#241f1a" },
+  // ===== v2.1 新增 2 条隐藏结局 =====
+  union:    { hidden:true,  title:"隐藏结局 · 工会申诉受理", sub:"你收集了录音 + 流水 + 未签协议三件硬证据，走了「和平劳动关系解决」路径。",
+    verdictFn: s => "该实习生选择了体制内路径：不撕破脸，不公开发帖，而是把证据递到了工会和劳动关系调解中心。三周后，所里的实习协议模板被要求重新修订。你没有成为网红——但你让后来的实习生不用再经历你所经历的一切。",
+    achv:"🕊️ 体制路径 ·「不是所有的正义都需要呐喊」", stamp:"调解", color:"#5f6b3c" },
+  partner:  { hidden:true,  title:"隐藏结局 · 你成了 HJC 的合伙人", sub:"你放弃了尊严，但换来了钱——90% 的应得工资一分没少。代价呢？",
+    verdictFn: s => "该实习生用 9 天的尊严换来了 80% 以上的工资回收。一年后，你坐在 HJC 旁边，手里端着同样品牌的咖啡，嘴里说着同样的话：「请你来是解决问题的，不是来学习的。」恭喜——这比「黑化」更可怕，因为你是在完全清醒的状态下走向深渊。",
+    achv:"💼 精致利己 ·「清醒地沉沦，比黑化更荒诞」", stamp:"合伙人", color:"#3c4a5a" },
 };
 
 /* ---------- HJC 聊天规则库 ---------- */
@@ -825,7 +918,7 @@ const CHAT_USER_OPTIONS = [
 
 <script>
 /* ============================================================
-   律所实习生存模拟器 · HJC の噩梦 v2.0 —— 逻辑层
+   律所实习生存模拟器 · HJC の噩梦 v2.1 —— 逻辑层
    ============================================================ */
 
 const $ = (id) => document.getElementById(id);
@@ -849,6 +942,7 @@ const state = {
   },
   newAchievements: [],
   runId: 0,
+  _gotLowWage: false,  // v2.1 B3: 追踪单日到手 ≤ 120
 };
 
 function screen(name){
@@ -972,6 +1066,8 @@ function checkRuntimeAchievements(){
   if(state.tagCounts.consecutiveObey >= 2) unlockAchievement("eq_match");
   if(state.tagCounts.consecutiveConfront >= 3) unlockAchievement("reverse_pua");
   if(SAVE.dailyDates && SAVE.dailyDates.length >= 3) unlockAchievement("daily_checker");
+  // v2.1 新成就
+  if(state.eventPoolSeen["xiaohongshu_exposed"]) unlockAchievement("internet_famous");
 }
 
 /* ---------- 精神值扣血（含身份加成） ---------- */
@@ -992,11 +1088,6 @@ function renderScene(){
   updateHUD();
 
   const hasHiddenBecome = sc.final && state.tagCounts.consecutiveObey >= 3;
-
-  const choicesHTML = sc.choices.map((ch, i) => {
-    if(ch.requireStreak === "obey3" && !hasHiddenBecome) return "";
-    return "";
-  }).join("");
 
   sceneBox().innerHTML =
     '<div class="paper rounded-2xl shadow-lg border border-[#d8cdb5] p-5 md:p-7 float-in">' +
@@ -1059,19 +1150,30 @@ function annotateChoicePercents(sceneIdx){
 }
 
 /* ---------- 处理主线选择 ---------- */
-function pick(ch, idx, fromEvent){
+function pick(ch, idx, fromWhat){
+  // fromWhat: false=主线, "event"=随机事件, "boss"=Boss战
   // 埋点
   try { _hit("choice_" + state.sceneIndex + "_" + String.fromCharCode(65 + (idx||0))); } catch(e){}
 
-  // 更新 tag 计数
+  // 更新 tag 计数（v2.1: 重写为简单 if/else，修复 consecutiveObey/Confront 计数 B2）
   const tags = ch.tags || [];
   const isConfront = tags.includes("confront");
   const isObey = tags.includes("obey");
   const isSlack = tags.includes("slack");
-  if(isConfront) { state.tagCounts.confront++; state.tagCounts.consecutiveConfront++; state.tagCounts.consecutiveObey = 0; }
-  else { state.tagCounts.consecutiveConfront = 0; }
-  if(isObey) { state.tagCounts.obey++; state.tagCounts.consecutiveObey++; }
-  else if(!fromEvent) { state.tagCounts.consecutiveObey = state.tagCounts.consecutiveObey > 0 && isSlack ? state.tagCounts.consecutiveObey : (isConfront?0:state.tagCounts.consecutiveObey); }
+  if (isObey) {
+    state.tagCounts.obey++;
+    state.tagCounts.consecutiveObey++;
+    state.tagCounts.consecutiveConfront = 0;
+  } else if (isConfront) {
+    state.tagCounts.confront++;
+    state.tagCounts.consecutiveConfront++;
+    state.tagCounts.consecutiveObey = 0;
+  } else if (fromWhat === "event" || fromWhat === "boss") {
+    // 事件/Boss 中非 obey/confront 选项重置两条 streak
+    state.tagCounts.consecutiveObey = 0;
+    state.tagCounts.consecutiveConfront = 0;
+  }
+  // else: 主线 slack 选项不打断 streak（保持现有值）
   if(isSlack) state.tagCounts.slack++;
   if(tags.includes("bargain")) state.tagCounts.bargain++;
   if(idx !== 2) state.tagCounts.allC = false;
@@ -1079,6 +1181,7 @@ function pick(ch, idx, fromEvent){
   // 数值结算
   applySanityDelta(ch.sanity || 0);
   state.money += (ch.money || 0);
+  if(ch.money > 0 && ch.money <= 120) state._gotLowWage = true;  // v2.1 B3
   state.lost += (ch.lost || 0);
   if(ch.peers) state.peers = Math.max(0, state.peers + ch.peers);
   if(ch.item) grantItem(ch.item);
@@ -1121,27 +1224,43 @@ function pick(ch, idx, fromEvent){
   } else if(ch.ending){
     next.textContent = "查看离职结算 →";
     next.onclick = () => {
-      // 隐藏结局判定
+      // 隐藏结局判定（优先级从高到低）
       if(ch.ending === "justice" && Object.keys(state.bag).length >= 5) return endGame("bureau");
+      // v2.1: justice + 录音+流水+未签协议三件硬证据 → 工会申诉
+      if(ch.ending === "justice" && state.bag["audio"] && state.bag["bank"] && state.bag["scan"]) return endGame("union");
       if(ch.ending === "escape" && state.tagCounts.consecutiveConfront >= 3) return endGame("reverse");
+      // v2.1: stay + 钱够了 + 不是 obey3 → 合伙人
+      if(ch.ending === "stay" && state.day >= 9 && state.money >= state.day * SHOULD_PER_DAY * 0.8 && state.tagCounts.consecutiveObey < 3) return endGame("partner");
       endGame(ch.ending);
     };
+  } else if(fromWhat === "boss"){
+    next.textContent = "回到主线 →";
+    next.onclick = () => afterBoss();
+  } else if(fromWhat === "event"){
+    next.textContent = "回到主线 →";
+    next.onclick = () => afterChoice("event");
   } else {
-    next.textContent = fromEvent ? "回到主线 →" : "熬到下一天 →";
-    next.onclick = () => afterChoice(fromEvent);
+    next.textContent = "熬到下一天 →";
+    next.onclick = () => afterChoice(false);
   }
   box.appendChild(next);
 }
 
-function afterChoice(fromEvent){
+function afterChoice(fromWhat){
+  // fromWhat: false=主线, "event"=随机事件, "boss"=Boss战
   // 随机事件已经处理完毕，走主线下一关
-  if(fromEvent){
-    // 从事件返回主线 → 已经预扣了本关，继续渲染当前 sceneIndex
+  if(fromWhat === "event"){
+    // 从随机事件返回主线 → 继续渲染当前 sceneIndex（事件不消耗天数）
     window.scrollTo({top:0, behavior:"smooth"});
     return renderScene();
   }
 
-  // Boss 战判定（卷王模式）
+  // Boss 战已由 afterBoss() 处理，不应走到这里
+  if(fromWhat === "boss"){
+    return afterBoss();
+  }
+
+  // 主线：检查 Boss 战判定（卷王模式）
   if(state.difficulty === "hard"){
     const boss = BOSSES.find(b => b.after === state.day && !state.eventPoolSeen["boss_"+b.id]);
     if(boss){
@@ -1164,6 +1283,17 @@ function afterChoice(fromEvent){
   // 正常前进
   state.sceneIndex++;
   if(state.sceneIndex >= SCENES.length) return endGame("survive");
+  window.scrollTo({top:0, behavior:"smooth"});
+  renderScene();
+}
+
+/* ---------- Boss 战后推进（v2.1: 修复 B6） ---------- */
+function afterBoss(){
+  // Boss 战结束后正常推进到下一关
+  state.sceneIndex++;
+  if(state.sceneIndex >= SCENES.length) return endGame("survive");
+
+  // Boss 后不立即触发另一个 Boss 或事件，直接进入下一关
   window.scrollTo({top:0, behavior:"smooth"});
   renderScene();
 }
@@ -1191,7 +1321,7 @@ function renderEvent(ev){
     b.innerHTML = '<span class="text-[var(--ochre)] font-black serif mr-2">' + String.fromCharCode(65+i) + '.</span>' + ch.text;
     b.onclick = () => {
       _hit("event_choice_" + ev.id + "_" + String.fromCharCode(65+i));
-      pick(ch, i, true);
+      pick(ch, i, "event");
     };
     box.appendChild(b);
   });
@@ -1225,7 +1355,7 @@ function renderBoss(boss){
     b.onclick = () => {
       clearInterval(bossTimer);
       const chosen = Object.assign({ result:"20 秒内你做出了决断。" }, ch);
-      pick(chosen, i, true);
+      pick(chosen, i, "boss");
     };
     box.appendChild(b);
   });
@@ -1237,7 +1367,7 @@ function renderBoss(boss){
     if(remain <= 0){
       clearInterval(bossTimer);
       const to = boss.timeout || { sanity:-15 };
-      pick(Object.assign({ result:"你没能在 20 秒内做出选择，HJC 直接给你判了差评。" }, to), 0, true);
+      pick(Object.assign({ result:"你没能在 20 秒内做出选择，HJC 直接给你判了差评。" }, to), 0, "boss");
     }
   }, 1000);
 }
@@ -1276,7 +1406,11 @@ function endGame(type){
   if(state.sceneIndex >= SCENES.length - 1) unlockAchievement("all_scenes");
   if(type === "escape" && state.day <= 3) unlockAchievement("fast_escape");
   if(got <= shouldGet * 0.5) unlockAchievement("cheapskate");
-  if(got === 100 || got === 110 || got === 120) unlockAchievement("wage_100");
+  // v2.1 B3 fix: 改为按「单日到手 ≤ 120」判定，避免多局叠加后漏判
+  if(state._gotLowWage) unlockAchievement("wage_100");
+  // v2.1 新成就
+  if(state.eventPoolSeen["peer_quit_drama"] && state.eventPoolSeen["old_classmate"]) unlockAchievement("rebel_leader");
+  if(state.identity === "local" && state.difficulty === "hard" && state.sceneIndex >= SCENES.length - 1) unlockAchievement("survivor_marathon");
 
   const e = ENDINGS[type] || ENDINGS.survive;
   const idn = IDENTITIES[state.identity];
@@ -1317,7 +1451,43 @@ function endGame(type){
   $("btn-share").onclick = downloadShareCard;
   $("btn-copy").onclick = () => copyShareText(type, e, { shouldGet, got, lost, sanity, itemsCount });
   $("btn-chat").onclick = () => openChat();
+  // v2.1: 结局链接分享
+  $("btn-seed-link").onclick = () => copySeedLink(type, e);
   if(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) $("shareHintMobile").classList.remove("hidden");
+}
+
+/* ---------- v2.1: URL seed 分享 ---------- */
+function copySeedLink(type, e){
+  const seed = {
+    v: "2.1", d: state.day, t: type, id: state.identity, df: state.difficulty,
+    g: state.money, l: state.lost, s: Math.max(0, state.sanity),
+    it: Object.keys(state.bag).join(","), stamp: e.stamp, achv: e.achv,
+  };
+  try{
+    const json = JSON.stringify(seed);
+    const b64 = btoa(unescape(encodeURIComponent(json)));
+    const url = window.location.origin + window.location.pathname + "?seed=" + b64;
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(url).then(()=>{
+        $("share-tip").textContent = "结局链接已复制，发给朋友看你的战绩 🔗";
+        $("share-tip").classList.remove("hidden");
+      }).catch(()=>{
+        $("share-tip").textContent = "复制失败，请长按选中链接手动复制";
+        $("share-tip").classList.remove("hidden");
+      });
+    }
+  }catch(err){
+    $("share-tip").textContent = "生成链接失败";
+    $("share-tip").classList.remove("hidden");
+  }
+}
+function tryLoadSeed(){
+  try{
+    const m = window.location.search.match(/[?&]seed=([^&]+)/);
+    if(!m) return null;
+    const json = decodeURIComponent(escape(atob(m[1])));
+    return JSON.parse(json);
+  }catch(e){ return null; }
 }
 
 function copyShareText(type, e, m){
@@ -1407,7 +1577,7 @@ function drawShareCard(type, e, m){
   // 底部
   ctx.fillStyle = "#241f1a"; ctx.globalAlpha = .55;
   ctx.font = "500 24px 'Noto Sans SC'"; ctx.textAlign = "center";
-  ctx.fillText("律所实习生存模拟器 · v2.0 · 仅供娱乐，人物均为虚构", W/2, H-160);
+  ctx.fillText("律所实习生存模拟器 · v2.1 · 仅供娱乐，人物均为虚构", W/2, H-160);
   ctx.font = "700 34px 'Noto Sans SC'"; ctx.globalAlpha = .85; ctx.fillStyle = "#a6231d";
   ctx.fillText("https://udgtsz.github.io/hjc-sim/", W/2, H-100);
   ctx.globalAlpha = 1;
@@ -1434,9 +1604,19 @@ function downloadShareCard(){
     a.download = "hjc-sim-" + endName + "-" + state.day + "天.png";
     a.href = url;
     document.body.appendChild(a); a.click(); a.remove();
-    toast("已下载 · 或右键 / 长按图片保存");
+    toast("已下载 · 也可右键 / 长按下方图片保存");
   }catch(e){
-    toast("下载失败，请长按下方图片保存");
+    // v2.1 B7: 移动端降级 —— 放大 canvas + 长按提示
+    cv.style.maxWidth = "100%";
+    cv.style.width = "100%";
+    cv.parentElement.style.padding = "8px";
+    cv.parentElement.style.background = "#fff";
+    $("shareHintMobile").classList.remove("hidden");
+    $("shareHintMobile").textContent = "📱 微信内置浏览器无法自动下载，请长按上方图片 → 保存到相册";
+    $("shareHintMobile").style.color = "var(--blood)";
+    $("shareHintMobile").style.fontWeight = "700";
+    $("shareHintMobile").style.fontSize = "14px";
+    toast("微信内请长按图片保存 📱");
   }
 }
 
@@ -1605,6 +1785,7 @@ function startGame(){
   state.eventPoolSeen = {};
   state.tagCounts = { confront:0, obey:0, slack:0, bargain:0, night:0, cCount:0, allC:true, consecutiveObey:0, consecutiveConfront:0 };
   state.newAchievements = [];
+  state._gotLowWage = false;
   state.runId++;
   RUN_START_AT = Date.now();
 
@@ -1622,6 +1803,29 @@ $("btn-restart").onclick = () => { screen("screen-start"); };
 renderIdentityGrid();
 updateHomeStats();
 renderBag();
+
+// v2.1: 加载 seed 参数显示分享预览
+(function showSeedPreview(){
+  const seed = tryLoadSeed();
+  if(!seed) return;
+  const banner = document.createElement("div");
+  banner.className = "paper rounded-2xl shadow-lg border-2 border-[var(--ochre)] p-5 mb-6 float-in";
+  banner.innerHTML =
+    '<p class="kicker text-xs text-[var(--ochre)] font-bold mb-2">📨 朋友发来了一份战绩</p>' +
+    '<p class="serif font-black text-2xl mb-1">' + (seed.stamp || "??") + '</p>' +
+    '<p class="text-[15px] text-[var(--ink)]/80 mb-3">' + seed.achv + '</p>' +
+    '<div class="text-sm text-[var(--ink)]/60 grid grid-cols-2 gap-2">' +
+      '<span>坚持 <b>' + seed.d + '</b> 天</span><span>到手 <b>¥' + seed.g + '</b></span>' +
+      '<span>被薅 <b>¥' + (seed.l||0) + '</b></span><span>精神值 <b>' + seed.s + '</b></span>' +
+      '<span>身份 <b>' + ((IDENTITIES[seed.id]||IDENTITIES.fresh).icon + " " + (IDENTITIES[seed.id]||IDENTITIES.fresh).name) + '</b></span>' +
+      '<span>难度 <b>' + (seed.df === "hard" ? "卷王模式" : "普通") + '</b></span>' +
+    '</div>' +
+    '<p class="text-[11px] text-[var(--ink)]/40 mt-3">👇 你也来试试，看能撑几天</p>';
+  const startSection = document.getElementById("screen-start");
+  if(startSection && startSection.firstChild){
+    startSection.insertBefore(banner, startSection.firstChild);
+  }
+})();
 
 </script>
 </body>
