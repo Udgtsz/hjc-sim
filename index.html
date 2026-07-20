@@ -135,7 +135,7 @@
 
       <div id="visitor-counter" class="mt-6 flex items-center justify-center gap-2 text-sm font-bold text-[var(--blood)]/80">
         <span class="material-symbols-outlined text-base">groups</span>
-        <span>已有 <span id="visitor-count" class="serif font-black text-[var(--blood)] text-base">…</span> 位实习生亲历过 HJC</span>
+        <span>已有 <span id="visitor-count" class="serif font-black text-[var(--blood)] text-base">…</span> 位实习生亲历过 HJC · <a href="./stats.html" class="underline hover:text-[var(--blood)]">查看数据看板 →</a></span>
       </div>
 
       <button id="btn-start" class="btn glow w-full mt-4 bg-[var(--blood)] hover:bg-[var(--blood-deep)] text-white font-black text-lg py-4 rounded-xl shadow-lg serif tracking-wider">
@@ -517,14 +517,43 @@ function renderScene(){
   sc.choices.forEach((ch, i) => {
     const b = document.createElement("button");
     b.className = "choice w-full text-left bg-white/70 hover:bg-white border-2 border-[#e2d8c2] hover:border-[var(--blood)]/60 rounded-xl px-4 py-3 text-[15px] font-medium";
-    b.innerHTML = '<span class="text-[var(--blood)] font-black serif mr-2">' + String.fromCharCode(65+i) + '.</span>' + ch.text;
-    b.onclick = () => pick(ch);
+    b.innerHTML = '<span class="text-[var(--blood)] font-black serif mr-2">' + String.fromCharCode(65+i) + '.</span>' + ch.text
+      + '<span class="choice-stat block text-[11px] mt-1.5 text-[var(--ink)]/40 font-normal">👥 加载历史选择中…</span>';
+    b.onclick = () => pick(ch, i);
     box.appendChild(b);
   });
+  annotateChoicePercents(state.sceneIndex);
+}
+
+// ---------- 获取历史选择占比并注解到按钮上 ----------
+function annotateChoicePercents(sceneIdx){
+  const letters = ["A","B","C"];
+  Promise.all(letters.map(L =>
+    fetch(ABACUS_BASE + "/get/" + ABACUS_NS + "/choice_" + sceneIdx + "_" + L, {mode:"cors"})
+      .then(r => r.ok ? r.json() : null).catch(()=>null)
+  )).then(rs => {
+    const counts = rs.map(r => (r && (r.value ?? r.count)) || 0);
+    const total = counts.reduce((a,b)=>a+b, 0);
+    const btns = document.querySelectorAll("#choices button.choice");
+    btns.forEach((btn, i) => {
+      const stat = btn.querySelector(".choice-stat");
+      if(!stat) return;
+      const c = counts[i] || 0;
+      if(total <= 0){
+        stat.textContent = "👥 还没有实习生做过这个选择，你是第一个";
+      } else {
+        const pct = Math.round(c * 100 / total);
+        stat.textContent = "👥 " + pct + "% 的实习生这样选（" + c + " 人）";
+        stat.style.color = pct >= 50 ? "var(--olive)" : "var(--ink)";
+      }
+    });
+  }).catch(()=>{});
 }
 
 // ---------- 处理选择 ----------
-function pick(ch){
+function pick(ch, idx){
+  // 埋点：记录当前场景选择分布
+  try { _hit("choice_" + state.sceneIndex + "_" + String.fromCharCode(65 + (idx||0))); } catch(e){}
   // 结算数值
   state.sanity = Math.min(100, state.sanity + (ch.sanity || 0));
   state.money += (ch.money || 0);

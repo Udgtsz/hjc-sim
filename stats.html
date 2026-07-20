@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<title>HJC 律所模拟器 · 数据看板</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+<style>
+  :root{ --paper:#f4efe4; --ink:#241f1a; --blood:#a6231d; --blood-deep:#7c1611; --ochre:#c98a2b; --olive:#5f6b3c; --steel:#3c4a5a; }
+  body{ font-family:'Noto Sans SC',sans-serif; color:var(--ink);
+    background: radial-gradient(circle at 20% 10%, rgba(201,138,43,.10), transparent 40%),
+                radial-gradient(circle at 85% 90%, rgba(166,35,29,.10), transparent 45%), #ece5d6; }
+  .serif{font-family:'Noto Serif SC',serif}
+  .paper{ background: linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,.5)), repeating-linear-gradient(0deg, rgba(0,0,0,.015) 0 2px, transparent 2px 4px); background-color:var(--paper); }
+  .bar{ height:8px; border-radius:99px; background:#e6ddc9; overflow:hidden; }
+  .bar > div{ height:100%; border-radius:99px; transition:width .8s cubic-bezier(.22,1,.36,1); }
+  .metric-card{ transition: transform .2s; }
+  .metric-card:hover{ transform: translateY(-2px); }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spin{animation:spin 1s linear infinite; display:inline-block}
+</style>
+</head>
+<body>
+<div class="max-w-4xl mx-auto px-4 py-8">
+
+  <header class="text-center mb-8">
+    <p class="text-xs font-bold tracking-[.35em] text-[var(--blood)] mb-2">HJC · LAW FIRM SIM · STATS</p>
+    <h1 class="serif font-black text-4xl md:text-5xl">数据看板</h1>
+    <p class="text-sm text-[var(--steel)] mt-2">实时汇总所有玩家行为数据 · <a href="./" class="underline hover:text-[var(--blood)]">← 返回游戏</a></p>
+    <div class="mt-3 flex items-center justify-center gap-3 text-xs text-[var(--ink)]/60">
+      <span id="last-updated">加载中…</span>
+      <button id="refresh-btn" class="px-3 py-1 rounded-full bg-[var(--blood)] text-white hover:bg-[var(--blood-deep)] transition">🔄 刷新</button>
+    </div>
+  </header>
+
+  <!-- 总量 -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+    <div class="metric-card paper rounded-xl shadow-md border border-[#d8cdb5] p-4 text-center">
+      <p class="text-[11px] font-bold text-[var(--blood)]">总访问</p>
+      <p class="serif font-black text-3xl mt-1" id="m-pv">…</p>
+      <p class="text-[11px] text-[var(--ink)]/50 mt-1">打开过页面</p>
+    </div>
+    <div class="metric-card paper rounded-xl shadow-md border border-[#d8cdb5] p-4 text-center">
+      <p class="text-[11px] font-bold text-[var(--ochre)]">开始游戏</p>
+      <p class="serif font-black text-3xl mt-1" id="m-start">…</p>
+      <p class="text-[11px] text-[var(--ink)]/50 mt-1">点了签卖身契</p>
+    </div>
+    <div class="metric-card paper rounded-xl shadow-md border border-[#d8cdb5] p-4 text-center">
+      <p class="text-[11px] font-bold text-[var(--olive)]">完成率</p>
+      <p class="serif font-black text-3xl mt-1" id="m-conv">…%</p>
+      <p class="text-[11px] text-[var(--ink)]/50 mt-1">开始 / 访问</p>
+    </div>
+    <div class="metric-card paper rounded-xl shadow-md border border-[#d8cdb5] p-4 text-center">
+      <p class="text-[11px] font-bold text-[var(--steel)]">走完全程</p>
+      <p class="serif font-black text-3xl mt-1" id="m-ending-total">…</p>
+      <p class="text-[11px] text-[var(--ink)]/50 mt-1">触发了任意结局</p>
+    </div>
+  </section>
+
+  <!-- 结局分布 -->
+  <section class="paper rounded-2xl shadow-lg border border-[#d8cdb5] p-5 md:p-6 mb-6">
+    <h2 class="serif font-black text-xl md:text-2xl mb-4"><span class="material-symbols-outlined align-middle text-[var(--blood)]">flag</span> 结局分布</h2>
+    <div id="endings-list" class="space-y-3"></div>
+  </section>
+
+  <!-- 坚持天数 -->
+  <section class="paper rounded-2xl shadow-lg border border-[#d8cdb5] p-5 md:p-6 mb-6">
+    <h2 class="serif font-black text-xl md:text-2xl mb-4"><span class="material-symbols-outlined align-middle text-[var(--ochre)]">calendar_month</span> 坚持天数分布</h2>
+    <div id="days-list" class="space-y-2"></div>
+  </section>
+
+  <!-- 用户画像 -->
+  <section class="paper rounded-2xl shadow-lg border border-[#d8cdb5] p-5 md:p-6 mb-6">
+    <h2 class="serif font-black text-xl md:text-2xl mb-4"><span class="material-symbols-outlined align-middle text-[var(--olive)]">person</span> 用户画像</h2>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div>
+        <p class="text-xs font-bold text-[var(--ink)]/60 mb-2">📱 设备</p>
+        <div id="device-list" class="space-y-2"></div>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-[var(--ink)]/60 mb-2">🌍 来源渠道</p>
+        <div id="refer-list" class="space-y-2"></div>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-[var(--ink)]/60 mb-2">🗣️ 语言</p>
+        <div id="lang-list" class="space-y-2"></div>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-[var(--ink)]/60 mb-2">💡 提示</p>
+        <p class="text-xs text-[var(--ink)]/60 leading-relaxed">画像数据基于浏览器 UA / 语言 / 时区 / Referrer，聚合展示，不含任何个人身份信息。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 每关选择分布 -->
+  <section class="paper rounded-2xl shadow-lg border border-[#d8cdb5] p-5 md:p-6 mb-6">
+    <h2 class="serif font-black text-xl md:text-2xl mb-4"><span class="material-symbols-outlined align-middle text-[var(--steel)]">forum</span> 每关选择分布</h2>
+    <div id="scenes-list" class="space-y-5"></div>
+  </section>
+
+  <p class="text-center text-[11px] text-[var(--ink)]/40 mt-8">数据来源：Abacus 公共计数服务 · 命名空间 <code>hjc-sim-2026</code></p>
+</div>
+
+<script>
+const BASE = "https://abacus.jasoncameron.dev/get/hjc-sim-2026/";
+const SCENES = [
+  { title:"第1天 · 消失的合同", choices:["坚持要签","算了先干活","偷偷留证据"] },
+  { title:"第2天 · 立案狂潮",   choices:["全接了不吃饭","委婉推辞","拉同伴分工"] },
+  { title:"第3天 · 沟通替身",   choices:["冒充律师助理","如实说实习生","整理文档甩回"] },
+  { title:"第4天 · 请教被怼",   choices:["追问把关","问同伴查资料","去茶水间冷静"] },
+  { title:"第5天 · 鸡同鸭讲",   choices:["再解释第四遍","画图列条","自己判断处理"] },
+  { title:"第6天 · 午饭刺客",   choices:["据理力争150","忍了收下100","自带便当反击"] },
+  { title:"第7天 · 砍价修罗场", choices:["硬砍一下午","如实说砍不动","私下跟对方道歉"] },
+  { title:"第8天 · 报销罗生门", choices:["天天追讨","整理证据准备维权","认栽当学费"] },
+  { title:"第9天 · 去还是留？", choices:["潇洒离职","天真留守","留证+离职+投诉"] },
+];
+const ENDING_KEYS = [
+  { key:"escape",   name:"🏃 潇洒逃离",     color:"var(--olive)" },
+  { key:"justice",  name:"⚖️ 留证维权",     color:"var(--blood)" },
+  { key:"survive",  name:"🛡️ 熬满全程",     color:"var(--ochre)" },
+  { key:"stay",     name:"💔 天真留守",     color:"var(--steel)" },
+  { key:"collapse", name:"🧠 精神崩溃",     color:"#8a5a2b" },
+];
+const DAY_KEYS = [
+  ["d1","第1天流失"],["d2","第2天流失"],["d3","第3天流失"],
+  ["d4","第4天流失"],["d5","第5天流失"],["d6","第6天流失"],
+  ["d7","第7天流失"],["d8","第8天流失"],["d9","第9天流失"],["9plus","第9天+"]
+];
+const DEVICE_KEYS = [ ["device_mobile","📱 移动端"], ["device_desktop","💻 桌面端"] ];
+const REFER_KEYS  = [
+  ["refer_direct","🔗 直接访问"],
+  ["refer_wechat","💬 微信来源"],
+  ["refer_lark","💼 飞书来源"],
+  ["refer_social","🌐 社交平台"],
+  ["refer_other","❓ 其他来源"],
+];
+const LANG_KEYS = [
+  ["lang_zh","中文"],["lang_en","English"],["lang_ja","日本語"],
+  ["lang_ko","한국어"],["lang_es","Español"],["lang_fr","Français"],["lang_de","Deutsch"],
+];
+
+async function getVal(key){
+  try {
+    const r = await fetch(BASE + key, {mode:"cors"});
+    if(!r.ok) return 0;
+    const j = await r.json();
+    return (j && (j.value ?? j.count)) || 0;
+  } catch(e){ return 0; }
+}
+async function getMany(keys){
+  const vs = await Promise.all(keys.map(k => getVal(k)));
+  return vs;
+}
+function fmt(n){ return (n||0).toLocaleString(); }
+function bar(container, items, color){
+  const total = items.reduce((a,b)=>a + (b.count||0), 0);
+  container.innerHTML = "";
+  if(total === 0){
+    container.innerHTML = '<p class="text-sm text-[var(--ink)]/50 italic">暂无数据</p>';
+    return;
+  }
+  items.sort((a,b)=>b.count - a.count);
+  items.forEach(it => {
+    const pct = total > 0 ? Math.round(it.count * 100 / total) : 0;
+    const row = document.createElement("div");
+    row.innerHTML =
+      '<div class="flex justify-between text-sm mb-1">'
+      + '<span class="font-medium">' + it.name + '</span>'
+      + '<span class="text-[var(--ink)]/60 font-mono">' + fmt(it.count) + ' · ' + pct + '%</span>'
+      + '</div>'
+      + '<div class="bar"><div style="width:' + pct + '%;background:' + (it.color || color || 'var(--blood)') + '"></div></div>';
+    container.appendChild(row);
+  });
+}
+
+async function loadAll(){
+  document.getElementById("last-updated").innerHTML = '<span class="spin">⏳</span> 拉取数据中…';
+
+  // 顶部四个总量
+  const [pv, gs] = await getMany(["page_view","game_start"]);
+  document.getElementById("m-pv").textContent = fmt(pv);
+  document.getElementById("m-start").textContent = fmt(gs);
+  document.getElementById("m-conv").textContent = pv > 0 ? Math.round(gs*100/pv) + "%" : "-";
+
+  // 结局
+  const endingVals = await getMany(ENDING_KEYS.map(e => "ending_" + e.key));
+  const totalEnding = endingVals.reduce((a,b)=>a+b,0);
+  document.getElementById("m-ending-total").textContent = fmt(totalEnding);
+  bar(document.getElementById("endings-list"),
+    ENDING_KEYS.map((e,i)=>({ name:e.name, count:endingVals[i], color:e.color })),
+    "var(--blood)"
+  );
+
+  // 天数
+  const dayVals = await getMany(DAY_KEYS.map(([k])=>"days_"+k));
+  bar(document.getElementById("days-list"),
+    DAY_KEYS.map(([k,name],i)=>({ name, count:dayVals[i] })),
+    "var(--ochre)"
+  );
+
+  // 设备
+  const devVals = await getMany(DEVICE_KEYS.map(([k])=>k));
+  bar(document.getElementById("device-list"),
+    DEVICE_KEYS.map(([k,name],i)=>({ name, count:devVals[i] })),
+    "var(--olive)"
+  );
+
+  // 来源
+  const refVals = await getMany(REFER_KEYS.map(([k])=>k));
+  bar(document.getElementById("refer-list"),
+    REFER_KEYS.map(([k,name],i)=>({ name, count:refVals[i] })),
+    "var(--steel)"
+  );
+
+  // 语言
+  const langVals = await getMany(LANG_KEYS.map(([k])=>k));
+  bar(document.getElementById("lang-list"),
+    LANG_KEYS.map(([k,name],i)=>({ name, count:langVals[i] })),
+    "var(--blood)"
+  );
+
+  // 每关选择
+  const container = document.getElementById("scenes-list");
+  container.innerHTML = "";
+  for(let i=0; i<SCENES.length; i++){
+    const sc = SCENES[i];
+    const vals = await getMany(["choice_"+i+"_A","choice_"+i+"_B","choice_"+i+"_C"]);
+    const total = vals.reduce((a,b)=>a+b,0);
+    const wrap = document.createElement("div");
+    wrap.className = "border-l-4 border-[var(--blood)]/40 pl-3";
+    let html = '<p class="font-black serif text-base mb-2">' + sc.title
+             + ' <span class="text-xs text-[var(--ink)]/50 font-normal">（共 ' + total + ' 次选择）</span></p>';
+    ["A","B","C"].forEach((L, idx) => {
+      const c = vals[idx];
+      const pct = total > 0 ? Math.round(c*100/total) : 0;
+      html += '<div class="mb-1.5">'
+        + '<div class="flex justify-between text-sm"><span><span class="text-[var(--blood)] font-black serif mr-2">' + L + '.</span>' + (sc.choices[idx] || "") + '</span>'
+        + '<span class="text-[var(--ink)]/60 font-mono">' + c + ' · ' + pct + '%</span></div>'
+        + '<div class="bar mt-1"><div style="width:' + pct + '%;background:var(--blood)"></div></div>'
+        + '</div>';
+    });
+    wrap.innerHTML = html;
+    container.appendChild(wrap);
+  }
+
+  document.getElementById("last-updated").textContent = "🕒 更新于 " + new Date().toLocaleString("zh-CN");
+}
+
+document.getElementById("refresh-btn").onclick = loadAll;
+loadAll();
+setInterval(loadAll, 60000); // 每 60 秒自动刷新
+</script>
+</body>
+</html>
